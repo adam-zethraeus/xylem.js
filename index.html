@@ -10,17 +10,8 @@
         margin: 5px auto;
     }
 </style>
+<script src="gl-matrix/gl-matrix-min.js"></script>
 <script src="xylem.js"></script>
-<script src="canvas.js"></script>
-<script>
-window.onload = function(){
-    var canvas = document.getElementById("render_canvas");
-    canvas.addEventListener("click", function(){
-        requestFullScreen(canvas);
-        requestPointerLock(canvas);
-    });
-};
-</script>
 </head>
 <body>
     <canvas id="render_canvas" width="640" height="480"></canvas>
