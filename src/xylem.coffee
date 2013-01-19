@@ -32,15 +32,18 @@ xylem = () ->
 	canvas = document.getElementById("render_canvas")
 	gl = initializeGL(canvas)
 	shaderProgram = getInitializedShaderProgram()
+	barrier = new Barrier()
 	textures = {
-		"earth": initializeTexture("textures/earth.jpg")
-		"metal": initializeTexture("textures/metal.jpg")
+		"earth": initializeTexture("textures/earth.jpg", barrier.getCallback())
+		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
 	}
-	teapot = loadModel("models/teapot.json")
-	teapotBuffers = getBuffersForModel(teapot)
-	gl.clearColor(0.0, 0.0, 0.0, 1.0)
-	gl.enable(gl.DEPTH_TEST)
-	tick(teapotBuffers, textures)
+	barrier.finalize(()->
+		teapot = loadModel("models/teapot.json")
+		teapotBuffers = getBuffersForModel(teapot)
+		gl.clearColor(0.0, 0.0, 0.0, 1.0)
+		gl.enable(gl.DEPTH_TEST)
+		tick(teapotBuffers, textures)
+	)
 
 tick = (buffers, textures) ->
 	requestAnimationFrame(()->tick(buffers, textures))
@@ -204,7 +207,7 @@ getBuffersForModel = (model)->
 	return buffers
 
 # asynchronously loads image
-initializeTexture = (url) ->
+initializeTexture = (url, callback) ->
 	texture = gl.createTexture()
 	texture.image = new Image()
 	texture.image.onload = () ->
@@ -215,6 +218,7 @@ initializeTexture = (url) ->
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 		gl.generateMipmap(gl.TEXTURE_2D);
 		gl.bindTexture(gl.TEXTURE_2D, null);
+		callback()
 	texture.image.src = url
 	return texture
 
