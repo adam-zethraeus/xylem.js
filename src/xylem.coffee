@@ -46,7 +46,7 @@ xylem = () ->
 	)
 
 tick = (buffers, textures) ->
-	requestAnimationFrame(()->tick(buffers, textures))
+	browserVersionOf("requestAnimationFrame")(()->tick(buffers, textures))
 	draw(buffers, textures)
 
 draw = (buffers, textures) ->
