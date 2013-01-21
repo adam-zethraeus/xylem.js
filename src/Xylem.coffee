@@ -2,20 +2,9 @@ window.onload = () ->
 	xylem()
 
 mvMatrix = mat4.create()
-mvMatrixStack = []
 pMatrix = mat4.create()
 shaderProgram = null
 gl = null
-
-mvPushMatrix = () ->
-	copy = mat4.create()
-	mat4.set(mvMatrix, copy)
-	mvMatrixStack.push(copy)
-
-mvPopMatrix = () ->
-	if mvMatrixStack.length is 0
-		throw "Invalid popMatrix!"
-	mvMatrix = mvMatrixStack.pop()
 
 setMatrixUniforms = () ->
 	gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
@@ -52,7 +41,7 @@ tick = (buffers, textures) ->
 draw = (buffers, textures) ->
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	mat4.perspective(45, gl.viewportWidth/gl.viewportHeight, 0.1, 100, pMatrix)
+	mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100, pMatrix)
 	specularHighlights = true
 	lighting = true
 	texture = "metal"
@@ -65,14 +54,14 @@ draw = (buffers, textures) ->
 		gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
 	gl.uniform1i(shaderProgram.useTexturesUniform, true)
 	mat4.identity(mvMatrix)
-	mat4.translate(mvMatrix, [0, 0, -40])
+	mat4.translate(mvMatrix, [0, 0, -30])
 	mat4.rotate(mvMatrix, degToRad(23.4), [1, 0, -1])
 	gl.activeTexture(gl.TEXTURE0)
 	if texture is "earth"
 		gl.bindTexture(gl.TEXTURE_2D, textures.earth)
 	else if texture is "metal"
 		gl.bindTexture(gl.TEXTURE_2D, textures.metal)
-	gl.uniform1i(shaderProgram.samplerUniform, 0) #needed?
+	gl.uniform1i(shaderProgram.samplerUniform, 0)
 	gl.uniform1f(shaderProgram.materialShininessUniform, 32.0)
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPositionBuffer)
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffers.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
