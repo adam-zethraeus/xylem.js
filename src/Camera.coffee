@@ -1,13 +1,16 @@
 class Camera
 	constructor: () ->
 		@modelMatrix = mat4.create()
+		@viewMatrix = mat4.create()
 		@projectionMatrix = mat4.create()
+		this.resetModelMatrix()
 
-	setPosition: (location)->
-
+	translate: (vector)->
+		mat4.translate(@modelMatrix, vector)
 	
-	setDirection: (direction)->
-
+	rotate: (degrees, axis)->
+		# TODO: work out negation issue.
+		mat4.rotate(@modelMatrix, -degToRad(degrees), axis)
 	
 	setProperties: (fov, viewportWidth, viewportHeight, nearClip, farClip)->
 		mat4.perspective(fov, viewportWidth / viewportHeight, nearClip, farClip, @projectionMatrix)
@@ -19,6 +22,11 @@ class Camera
 		return @projection
 
 	getViewMatrix: ()->
-		viewMatrix = mat4.create()
-		mat4.inverse(@modelMatrix, viewMatrix)
-		return viewMatrix
+		this.recalculateViewMatrix()
+		return @viewMatrix
+
+	resetModelMatrix: ()->
+		mat4.identity(@modelMatrix)
+
+	recalculateViewMatrix: ()->
+		mat4.inverse(@modelMatrix, @viewMatrix)

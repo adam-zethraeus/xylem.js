@@ -5,6 +5,27 @@ mvMatrix = mat4.create()
 pMatrix = mat4.create()
 shaderProgram = null
 gl = null
+camera = null
+
+xylem = () ->
+	canvas = document.getElementById("render_canvas")
+	gl = initializeGL(canvas)
+	shaderProgram = getInitializedShaderProgram()
+	teapot = loadModel("models/teapot.json")
+	teapotBuffers = getBuffersForModel(teapot)
+	camera = new Camera()
+	camera.translate([0,0,20])
+	camera.rotate(5, [0, 1, 0])
+	gl.clearColor(0.0, 0.0, 0.0, 1.0)
+	gl.enable(gl.DEPTH_TEST)
+	barrier = new Barrier()
+	textures = {
+		"earth": initializeTexture("textures/earth.jpg", barrier.getCallback())
+		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
+	}
+	barrier.finalize(()->
+		tick(teapotBuffers, textures)
+	)
 
 setMatrixUniforms = () ->
 	gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
@@ -16,23 +37,6 @@ setMatrixUniforms = () ->
 
 degToRad = (degrees) ->
 	return degrees * Math.PI / 180;
-
-xylem = () ->
-	canvas = document.getElementById("render_canvas")
-	gl = initializeGL(canvas)
-	shaderProgram = getInitializedShaderProgram()
-	barrier = new Barrier()
-	textures = {
-		"earth": initializeTexture("textures/earth.jpg", barrier.getCallback())
-		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
-	}
-	barrier.finalize(()->
-		teapot = loadModel("models/teapot.json")
-		teapotBuffers = getBuffersForModel(teapot)
-		gl.clearColor(0.0, 0.0, 0.0, 1.0)
-		gl.enable(gl.DEPTH_TEST)
-		tick(teapotBuffers, textures)
-	)
 
 tick = (buffers, textures) ->
 	browserVersionOf("requestAnimationFrame")(()->tick(buffers, textures))
@@ -55,15 +59,8 @@ draw = (buffers, textures) ->
 	gl.uniform1i(shaderProgram.useTexturesUniform, true)
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
-	mat4.rotate(mvMatrix, degToRad(23.4), [1, 0, -1])
-
-	cam = mat4.create()
-	mat4.identity(cam)
-	mat4.translate(cam, [0,0,20])
-	mat4.rotate(cam, degToRad(-10), [0, 1, 0])
-	viewM = mat4.create()
-	mat4.inverse(cam, viewM)
-	mat4.multiply(viewM, mvMatrix, mvMatrix) #order of mult, strange?
+	mat4.rotate(mvMatrix, degToRad(120), [1, 0, -1])
+	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix) #order of mult, strange?
 
 	gl.activeTexture(gl.TEXTURE0)
 	if texture is "earth"
