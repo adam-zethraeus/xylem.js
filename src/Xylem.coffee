@@ -54,8 +54,17 @@ draw = (buffers, textures) ->
 		gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
 	gl.uniform1i(shaderProgram.useTexturesUniform, true)
 	mat4.identity(mvMatrix)
-	mat4.translate(mvMatrix, [0, 0, -30])
+	mat4.translate(mvMatrix, [0, 0, -60])
 	mat4.rotate(mvMatrix, degToRad(23.4), [1, 0, -1])
+
+	cam = mat4.create()
+	mat4.identity(cam)
+	mat4.translate(cam, [0,0,20])
+	mat4.rotate(cam, degToRad(-10), [0, 1, 0])
+	viewM = mat4.create()
+	mat4.inverse(cam, viewM)
+	mat4.multiply(viewM, mvMatrix, mvMatrix) #order of mult, strange?
+
 	gl.activeTexture(gl.TEXTURE0)
 	if texture is "earth"
 		gl.bindTexture(gl.TEXTURE_2D, textures.earth)
