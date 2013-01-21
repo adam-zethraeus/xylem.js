@@ -14,6 +14,8 @@ xylem = () ->
 	teapot = loadModel("models/teapot.json")
 	teapotBuffers = getBuffersForModel(teapot)
 	camera = new Camera()
+	camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
+	pMatrix = camera.getProjectionMatrix()
 	camera.translate([0,0,20])
 	camera.rotate(5, [0, 1, 0])
 	gl.clearColor(0.0, 0.0, 0.0, 1.0)
@@ -24,7 +26,7 @@ xylem = () ->
 		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
 	}
 	barrier.finalize(()->
-		tick(teapotBuffers, textures)
+		draw(teapotBuffers, textures)
 	)
 
 setMatrixUniforms = () ->
@@ -36,16 +38,12 @@ setMatrixUniforms = () ->
 	gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix)
 
 degToRad = (degrees) ->
-	return degrees * Math.PI / 180;
-
-tick = (buffers, textures) ->
-	browserVersionOf("requestAnimationFrame")(()->tick(buffers, textures))
-	draw(buffers, textures)
+	return degrees * (Math.PI / 180);
 
 draw = (buffers, textures) ->
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100, pMatrix)
+	
 	specularHighlights = true
 	lighting = true
 	texture = "metal"

@@ -9,8 +9,7 @@ class Camera
 		mat4.translate(@modelMatrix, vector)
 	
 	rotate: (degrees, axis)->
-		# TODO: work out negation issue.
-		mat4.rotate(@modelMatrix, -degToRad(degrees), axis)
+		mat4.rotate(@modelMatrix, degToRad(degrees), axis)
 	
 	setProperties: (fov, viewportWidth, viewportHeight, nearClip, farClip)->
 		mat4.perspective(fov, viewportWidth / viewportHeight, nearClip, farClip, @projectionMatrix)
@@ -18,8 +17,8 @@ class Camera
 	getModelMatrix: ()->
 		return @modelMatrix
 
-	getProjectionMatix: ()->
-		return @projection
+	getProjectionMatrix: ()->
+		return @projectionMatrix
 
 	getViewMatrix: ()->
 		this.recalculateViewMatrix()
