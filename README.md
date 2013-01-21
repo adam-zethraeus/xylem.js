@@ -1,4 +1,4 @@
-xylem
+Xylem
 =====
 
-A browser based deferred render.
+(Not yet) a browser based deferred render.
