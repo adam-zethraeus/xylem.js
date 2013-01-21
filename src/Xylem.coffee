@@ -43,17 +43,13 @@ degToRad = (degrees) ->
 draw = (buffers, textures) ->
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	
 	specularHighlights = true
-	lighting = true
 	texture = "metal"
 	gl.uniform1i(shaderProgram.showSpecularHighlightsUniform, specularHighlights)
-	gl.uniform1i(shaderProgram.useLightingUniform, lighting)
-	if lighting
-		gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
-		gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
-		gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
-		gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
+	gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
+	gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
+	gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
+	gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
 	gl.uniform1i(shaderProgram.useTexturesUniform, true)
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
@@ -139,7 +135,6 @@ getInitializedShaderProgram = () ->
 	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess")
 	program.showSpecularHighlightsUniform = gl.getUniformLocation(program, "uShowSpecularHighlights")
 	program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures")
-	program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting")
 	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor")
 	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation")
 	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor")

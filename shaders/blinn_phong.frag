@@ -7,7 +7,6 @@
     uniform float uMaterialShininess;
 
     uniform bool uShowSpecularHighlights;
-    uniform bool uUseLighting;
     uniform bool uUseTextures;
 
     uniform vec3 uAmbientColor;
@@ -21,9 +20,6 @@
 
     void main(void) {
         vec3 lightWeighting;
-        if (!uUseLighting) {
-            lightWeighting = vec3(1.0, 1.0, 1.0);
-        } else {
             vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
             vec3 normal = normalize(vTransformedNormal);
 
@@ -39,7 +35,6 @@
             lightWeighting = uAmbientColor
                 + uPointLightingSpecularColor * specularLightWeighting
                 + uPointLightingDiffuseColor * diffuseLightWeighting;
-        }
 
         vec4 fragmentColor;
         if (uUseTextures) {
