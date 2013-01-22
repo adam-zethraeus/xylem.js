@@ -6,6 +6,7 @@ appFiles  = [
   'Camera'
   'Model'
   'Texture'
+  'ShaderProgram'
 ]
 
 task 'build', 'Build single application file from source files', ->
