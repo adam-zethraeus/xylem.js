@@ -5,6 +5,7 @@ appFiles  = [
   'Xylem'
   'Camera'
   'Model'
+  'Texture'
 ]
 
 task 'build', 'Build single application file from source files', ->

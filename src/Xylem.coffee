@@ -19,13 +19,9 @@ xylem = () ->
 	camera.rotate(5, [0, 1, 0])
 	gl.clearColor(0.0, 0.0, 0.0, 1.0)
 	gl.enable(gl.DEPTH_TEST)
-	barrier = new Barrier()
-	textures = {
-		"earth": initializeTexture("textures/earth.jpg", barrier.getCallback())
-		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
-	}
-	barrier.finalize(()->
-		draw(teapot.getBuffers(), textures)
+	metalTexture = new Texture(gl)
+	metalTexture.setImage("textures/metal.jpg", ()->
+		draw(teapot.getBuffers(), metalTexture.getTexture())
 	)
 
 setMatrixUniforms = () ->
@@ -39,10 +35,9 @@ setMatrixUniforms = () ->
 degToRad = (degrees) ->
 	return degrees * (Math.PI / 180);
 
-draw = (buffers, textures) ->
+draw = (buffers, glTexture) ->
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	texture = "metal"
 	gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
 	gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
 	gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
@@ -55,10 +50,7 @@ draw = (buffers, textures) ->
 	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix)
 
 	gl.activeTexture(gl.TEXTURE0)
-	if texture is "earth"
-		gl.bindTexture(gl.TEXTURE_2D, textures.earth)
-	else if texture is "metal"
-		gl.bindTexture(gl.TEXTURE_2D, textures.metal)
+	gl.bindTexture(gl.TEXTURE_2D, glTexture)
 	gl.uniform1i(shaderProgram.samplerUniform, 0)
 	gl.uniform1f(shaderProgram.materialShininessUniform, 32.0)
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPositionBuffer)
@@ -137,22 +129,6 @@ getInitializedShaderProgram = () ->
 	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor")
 	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor")
 	return program
-
-# asynchronously loads image
-initializeTexture = (url, callback) ->
-	texture = gl.createTexture()
-	texture.image = new Image()
-	texture.image.onload = () ->
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-		gl.bindTexture(gl.TEXTURE_2D, texture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-		gl.generateMipmap(gl.TEXTURE_2D);
-		gl.bindTexture(gl.TEXTURE_2D, null);
-		callback()
-	texture.image.src = url
-	return texture
 
 failure = (params...) ->
 	console.log("Xylem Failure: ")
