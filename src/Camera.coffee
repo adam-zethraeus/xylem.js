@@ -1,4 +1,5 @@
 class Camera
+	
 	constructor: () ->
 		@modelMatrix = mat4.create()
 		@viewMatrix = mat4.create()
