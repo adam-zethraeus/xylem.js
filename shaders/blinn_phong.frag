@@ -6,7 +6,6 @@
 
     uniform float uMaterialShininess;
 
-    uniform bool uShowSpecularHighlights;
     uniform bool uUseTextures;
 
     uniform vec3 uAmbientColor;
@@ -23,13 +22,10 @@
             vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
             vec3 normal = normalize(vTransformedNormal);
 
-            float specularLightWeighting = 0.0;
-            if (uShowSpecularHighlights) {
-                vec3 eyeDirection = normalize(-vPosition.xyz);
-                vec3 reflectionDirection = reflect(-lightDirection, normal);
+            vec3 eyeDirection = normalize(-vPosition.xyz);
+            vec3 reflectionDirection = reflect(-lightDirection, normal);
 
-                specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
-            }
+            float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
 
             float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0);
             lightWeighting = uAmbientColor
