@@ -4,6 +4,7 @@ fs     = require 'fs'
 appFiles  = [
   'Xylem'
   'Camera'
+  'Model'
 ]
 
 task 'build', 'Build single application file from source files', ->

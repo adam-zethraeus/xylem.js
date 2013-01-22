@@ -11,8 +11,7 @@ xylem = () ->
 	canvas = document.getElementById("render_canvas")
 	gl = initializeGL(canvas)
 	shaderProgram = getInitializedShaderProgram()
-	teapot = loadModel("models/teapot.json")
-	teapotBuffers = getBuffersForModel(teapot)
+	teapot = new Model(gl, "models/teapot.json")
 	camera = new Camera()
 	camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
 	pMatrix = camera.getProjectionMatrix()
@@ -26,7 +25,7 @@ xylem = () ->
 		"metal": initializeTexture("textures/metal.jpg", barrier.getCallback())
 	}
 	barrier.finalize(()->
-		draw(teapotBuffers, textures)
+		draw(teapot.getBuffers(), textures)
 	)
 
 setMatrixUniforms = () ->
@@ -54,7 +53,8 @@ draw = (buffers, textures) ->
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
 	mat4.rotate(mvMatrix, degToRad(120), [1, 0, -1])
-	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix) #order of mult, strange?
+	
+	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix)
 
 	gl.activeTexture(gl.TEXTURE0)
 	if texture is "earth"
@@ -140,59 +140,6 @@ getInitializedShaderProgram = () ->
 	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor")
 	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor")
 	return program
-
-loadModel = (url) ->
-	model = null
-	httpRequest = new XMLHttpRequest()
-	httpRequest.addEventListener(
-		"readystatechange"
-		() ->
-			return null if httpRequest.readyState isnt 4
-			if httpRequest.status is 200
-				model = JSON.parse(httpRequest.responseText)
-			else
-				failure("A model could not be downloaded.")
-				return null
-	)
-	# used synchronously
-	httpRequest.open("GET", url, false)
-	httpRequest.send()
-	# Model has now been set
-	return model
-
-getBuffersForModel = (model)->
-	buffers = {
-		vertexPositionBuffer: null
-		vertexNormalBuffer: null
-		vertexTextureCoordBuffer: null
-		vertexIndexBuffer: null
-	}
-
-	buffers.vertexNormalBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexNormalBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertexNormals), gl.STATIC_DRAW);
-	buffers.vertexNormalBuffer.itemSize = 3;
-	buffers.vertexNormalBuffer.numItems = model.vertexNormals.length / 3;
-
-	buffers.vertexTextureCoordBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexTextureCoordBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertexTextureCoords), gl.STATIC_DRAW);
-	buffers.vertexTextureCoordBuffer.itemSize = 2;
-	buffers.vertexTextureCoordBuffer.numItems = model.vertexTextureCoords.length / 2;
-
-	buffers.vertexPositionBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPositionBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model.vertexPositions), gl.STATIC_DRAW);
-	buffers.vertexPositionBuffer.itemSize = 3;
-	buffers.vertexPositionBuffer.numItems = model.vertexPositions.length / 3;
-
-	buffers.vertexIndexBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), gl.STATIC_DRAW);
-	buffers.vertexIndexBuffer.itemSize = 1;
-	buffers.vertexIndexBuffer.numItems = model.indices.length;
-
-	return buffers
 
 # asynchronously loads image
 initializeTexture = (url, callback) ->
