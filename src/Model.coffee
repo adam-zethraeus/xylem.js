@@ -1,7 +1,6 @@
 class Model
 
-	constructor: (glContext, url)->
-		@glContext = glContext
+	constructor: (@glContext, url)->
 		@buffers = {
 			vertexPositionBuffer: null
 			vertexNormalBuffer: null
@@ -11,7 +10,6 @@ class Model
 		this.loadBuffersFromJSON(url)
 
 	loadBuffersFromJSON: (url)->
-		console.log("load")
 		model = null
 		httpRequest = new XMLHttpRequest()
 		httpRequest.addEventListener(
