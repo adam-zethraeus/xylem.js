@@ -3,7 +3,6 @@ window.onload = () ->
 
 mvMatrix = mat4.create()
 pMatrix = mat4.create()
-shaderProgram = null
 gl = null
 camera = null
 
@@ -25,35 +24,26 @@ xylem = () ->
 		vert = sp.getShaderText("shaders/blinn_phong.vert")
 		frag_comp = sp.compileShader(frag, gl.FRAGMENT_SHADER)
 		vert_comp = sp.compileShader(vert, gl.VERTEX_SHADER)
-		sp.initializeProgram(vert_comp, frag_comp);
-		shaderProgram = sp.getProgram()
-		draw(teapot.getBuffers(), metalTexture.getTexture())
+		sp.enableProgram(vert_comp, frag_comp);
+		draw(teapot.getBuffers(), metalTexture.getTexture(), sp.getProgram())
 	)
 
-setMatrixUniforms = () ->
-	gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
-	gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
-	normalMatrix = mat3.create()
-	mat4.toInverseMat3(mvMatrix, normalMatrix)
-	mat3.transpose(normalMatrix)
-	gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix)
-
-degToRad = (degrees) ->
-	return degrees * (Math.PI / 180);
-
-draw = (buffers, glTexture) ->
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
-	gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
-	gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
-	gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
-	gl.uniform1i(shaderProgram.useTexturesUniform, true)
+draw = (buffers, glTexture, shaderProgram) ->
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
 	mat4.rotate(mvMatrix, degToRad(120), [1, 0, -1])
 	
 	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix)
+
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+	gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
+	gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
+	gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
+	gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
+	gl.uniform1i(shaderProgram.useTexturesUniform, true)
+
 
 	gl.activeTexture(gl.TEXTURE0)
 	gl.bindTexture(gl.TEXTURE_2D, glTexture)
@@ -69,7 +59,14 @@ draw = (buffers, glTexture) ->
 	gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, buffers.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0)
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer)
-	setMatrixUniforms()
+	
+	gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
+	gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
+	normalMatrix = mat3.create()
+	mat4.toInverseMat3(mvMatrix, normalMatrix)
+	mat3.transpose(normalMatrix)
+	gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix)
+
 	gl.drawElements(gl.TRIANGLES, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
 
 initializeGL = (canvas) ->
@@ -87,6 +84,5 @@ failure = (params...) ->
 	console.log("Xylem Failure: ")
 	console.log(param) for param in params
 
-
-
-
+degToRad = (degrees) ->
+	return degrees * (Math.PI / 180);

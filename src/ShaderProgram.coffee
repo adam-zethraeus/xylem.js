@@ -32,7 +32,7 @@ class ShaderProgram
 			return shader
 
 	#TODO: get all of the setUniforms out of here
-	initializeProgram: (vertexShader, fragmentShader)->
+	enableProgram: (vertexShader, fragmentShader)->
 		if not @glContext.getShaderParameter(vertexShader, @glContext.COMPILE_STATUS) or not @glContext.getShaderParameter(fragmentShader, @glContext.COMPILE_STATUS)
 			throw "shaders haven't been compiled"
 		@program = @glContext.createProgram()
@@ -42,7 +42,6 @@ class ShaderProgram
 		if not @glContext.getProgramParameter(@program, @glContext.LINK_STATUS)
 			failure("Could not link a program.")
 			return null
-		@glContext.useProgram(@program)
 		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "aVertexPosition")
 		@glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
 		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "aVertexNormal")
@@ -59,6 +58,7 @@ class ShaderProgram
 		@program.pointLightingLocationUniform = @glContext.getUniformLocation(@program, "uPointLightingLocation")
 		@program.pointLightingSpecularColorUniform = @glContext.getUniformLocation(@program, "uPointLightingSpecularColor")
 		@program.pointLightingDiffuseColorUniform = @glContext.getUniformLocation(@program, "uPointLightingDiffuseColor")
+		@glContext.useProgram(@program)
 		return @program
 
 	getProgram: ()->
