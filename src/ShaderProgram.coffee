@@ -1,24 +1,28 @@
 class ShaderProgram
 
 	constructor: (@glContext)->
+		@program = null
 
-	getShaderText: (url, callback)->
+	#TODO: get rid of this.
+	getShaderText: (url)->
+		shaderText = null
 		httpRequest = new XMLHttpRequest()
 		httpRequest.addEventListener(
 			"readystatechange"
 			() ->
 				return null if httpRequest.readyState isnt 4
 				if httpRequest.status is 200
-					callback(httpRequest.responseText)
+					shaderText = httpRequest.responseText
 				else
 					failure("A shader could not be downloaded.")
 					return null
 		)
-		httpRequest.open("GET", url, true)
+		httpRequest.open("GET", url, false)
 		httpRequest.send()
+		return shaderText
 
 	compileShader: (shaderText, glShaderType)->
-		shader = @glContext.createShader(type)
+		shader = @glContext.createShader(glShaderType)
 		@glContext.shaderSource(shader, shaderText)
 		@glContext.compileShader(shader)
 		if not @glContext.getShaderParameter(shader, @glContext.COMPILE_STATUS)
@@ -27,6 +31,7 @@ class ShaderProgram
 		else 
 			return shader
 
+	#TODO: get all of the setUniforms out of here
 	initializeProgram: (vertexShader, fragmentShader)->
 		if not @glContext.getShaderParameter(vertexShader, @glContext.COMPILE_STATUS) or not @glContext.getShaderParameter(fragmentShader, @glContext.COMPILE_STATUS)
 			throw "shaders haven't been compiled"
@@ -54,4 +59,7 @@ class ShaderProgram
 		@program.pointLightingLocationUniform = @glContext.getUniformLocation(@program, "uPointLightingLocation")
 		@program.pointLightingSpecularColorUniform = @glContext.getUniformLocation(@program, "uPointLightingSpecularColor")
 		@program.pointLightingDiffuseColorUniform = @glContext.getUniformLocation(@program, "uPointLightingDiffuseColor")
+		return @program
+
+	getProgram: ()->
 		return @program

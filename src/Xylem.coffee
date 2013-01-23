@@ -10,7 +10,6 @@ camera = null
 xylem = () ->
 	canvas = document.getElementById("render_canvas")
 	gl = initializeGL(canvas)
-	shaderProgram = getInitializedShaderProgram()
 	teapot = new Model(gl, "models/teapot.json")
 	camera = new Camera()
 	camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
@@ -21,6 +20,13 @@ xylem = () ->
 	gl.enable(gl.DEPTH_TEST)
 	metalTexture = new Texture(gl)
 	metalTexture.setImage("textures/metal.jpg", ()->
+		sp = new ShaderProgram(gl)
+		frag = sp.getShaderText("shaders/blinn_phong.frag")
+		vert = sp.getShaderText("shaders/blinn_phong.vert")
+		frag_comp = sp.compileShader(frag, gl.FRAGMENT_SHADER)
+		vert_comp = sp.compileShader(vert, gl.VERTEX_SHADER)
+		sp.initializeProgram(vert_comp, frag_comp);
+		shaderProgram = sp.getProgram()
 		draw(teapot.getBuffers(), metalTexture.getTexture())
 	)
 
@@ -76,59 +82,6 @@ initializeGL = (canvas) ->
 	else
 		failure("Could not initialize WebGL.", gl)
 		return null
-
-getShader = (url, type) ->
-	shader = null
-	httpRequest = new XMLHttpRequest()
-	httpRequest.addEventListener(
-		"readystatechange"
-		() ->
-			return null if httpRequest.readyState isnt 4
-			if httpRequest.status is 200
-				shader = gl.createShader(type)
-				gl.shaderSource(shader, httpRequest.responseText)
-				gl.compileShader(shader)
-				if not gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-					failure("A shader would not compile.", gl.getShaderInfoLog(shader))
-					return null
-			else
-				failure("A shader could not be downloaded.")
-				return null
-	)
-	# used synchronously
-	httpRequest.open("GET", url, false)
-	httpRequest.send()
-	# shader has now been set
-	return shader
-
-getInitializedShaderProgram = () ->
-	fragmentShader = getShader("shaders/blinn_phong.frag", gl.FRAGMENT_SHADER)
-	vertexShader = getShader("shaders/blinn_phong.vert", gl.VERTEX_SHADER)
-	program = gl.createProgram()
-	gl.attachShader(program, vertexShader)
-	gl.attachShader(program, fragmentShader)
-	gl.linkProgram(program)
-	if not gl.getProgramParameter(program, gl.LINK_STATUS)
-		failure("Could not link a program.")
-		return null
-	gl.useProgram(program)
-	program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition")
-	gl.enableVertexAttribArray(program.vertexPositionAttribute)
-	program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal")
-	gl.enableVertexAttribArray(program.vertexNormalAttribute)
-	program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord")
-	gl.enableVertexAttribArray(program.textureCoordAttribute)
-	program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix")
-	program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix")
-	program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix")
-	program.samplerUniform = gl.getUniformLocation(program, "uSampler")
-	program.materialShininessUniform = gl.getUniformLocation(program, "uMaterialShininess")
-	program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures")
-	program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor")
-	program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation")
-	program.pointLightingSpecularColorUniform = gl.getUniformLocation(program, "uPointLightingSpecularColor")
-	program.pointLightingDiffuseColorUniform = gl.getUniformLocation(program, "uPointLightingDiffuseColor")
-	return program
 
 failure = (params...) ->
 	console.log("Xylem Failure: ")
