@@ -25,13 +25,14 @@ xylem = () ->
 		sp.compileShader(frag, gl.FRAGMENT_SHADER)
 		sp.compileShader(vert, gl.VERTEX_SHADER)
 		sp.enableProgram()
-		draw(teapot.getBuffers(), metalTexture.getTexture(), sp)
+		draw(teapot.getBuffers(), metalTexture.getTexture(), sp, 0)
 	)
 
-draw = (buffers, glTexture, shaderProgram) ->
+draw = (buffers, glTexture, shaderProgram, rotate) ->
+	browserVersionOf("requestAnimationFrame")(()->draw(buffers, glTexture, shaderProgram, ++rotate))
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
-	mat4.rotate(mvMatrix, degToRad(120), [1, 0, -1])
+	mat4.rotate(mvMatrix, degToRad(120 + rotate), [1, 0, -1])
 	
 	mat4.multiply(camera.getViewMatrix(), mvMatrix, mvMatrix)
 

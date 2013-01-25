@@ -29,8 +29,6 @@ class ShaderProgram
 		throw "A shader would not compile." if not @glContext.getShaderParameter(glShader, @glContext.COMPILE_STATUS)
 		@shaders.push(glShader)
 
-
-	#TODO: get all of the setUniforms out of here
 	enableProgram: ()->
 		@program = @glContext.createProgram()
 		for shader in @shaders
@@ -40,7 +38,7 @@ class ShaderProgram
 		if not @glContext.getProgramParameter(@program, @glContext.LINK_STATUS)
 			throw "Shader couldn't be linked."
 		@glContext.useProgram(@program)
-		
+
 		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "aVertexPosition")
 		@glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
 		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "aVertexNormal")
