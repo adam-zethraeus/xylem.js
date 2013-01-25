@@ -22,17 +22,9 @@ xylem = () ->
 		sp = new ShaderProgram(gl)
 		frag = sp.getShaderText("shaders/blinn_phong.frag")
 		vert = sp.getShaderText("shaders/blinn_phong.vert")
-		frag_comp = sp.compileShader(frag, gl.FRAGMENT_SHADER)
-		vert_comp = sp.compileShader(vert, gl.VERTEX_SHADER)
-		sp.enableProgram(vert_comp, frag_comp);
-		sp.setUniform3f("uPointLightingDiffuseColor", [0.8, 0.8, 0.8])
-		sp.setUniform1i("uUseTextures", 1);
-		sp.setUniform3f("uPointLightingSpecularColor", [0.8, 0.8, 0.8])
-		sp.setUniform3f("uAmbientColor", [0.2, 0.2, 0.2])
-		sp.setUniform3f("uPointLightingLocation", [-10.0, 4.0, -20.0])
-		sp.setUniform1f("uMaterialShininess", 32.0)
-		sp.setUniform1i("uSampler", 0)
-
+		sp.compileShader(frag, gl.FRAGMENT_SHADER)
+		sp.compileShader(vert, gl.VERTEX_SHADER)
+		sp.enableProgram()
 		draw(teapot.getBuffers(), metalTexture.getTexture(), sp)
 	)
 
@@ -60,13 +52,21 @@ draw = (buffers, glTexture, shaderProgram) ->
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer)
 	
-	gl.uniformMatrix4fv(shaderProgram.getProgram().pMatrixUniform, false, pMatrix)
-	gl.uniformMatrix4fv(shaderProgram.getProgram().mvMatrixUniform, false, mvMatrix)
+	shaderProgram.setUniform3f("uPointLightingDiffuseColor", [0.8, 0.8, 0.8])
+	shaderProgram.setUniform1i("uUseTextures", 1);
+	shaderProgram.setUniform3f("uPointLightingSpecularColor", [0.8, 0.8, 0.8])
+	shaderProgram.setUniform3f("uAmbientColor", [0.2, 0.2, 0.2])
+	shaderProgram.setUniform3f("uPointLightingLocation", [-10.0, 4.0, -20.0])
+	shaderProgram.setUniform1f("uMaterialShininess", 32.0)
+	shaderProgram.setUniform1i("uSampler", 0)
+
+	shaderProgram.setUniformMatrix4fv("uPMatrix", pMatrix)
+	shaderProgram.setUniformMatrix4fv("uMVMatrix", mvMatrix)
 	normalMatrix = mat3.create()
 	mat4.toInverseMat3(mvMatrix, normalMatrix)
 	mat3.transpose(normalMatrix)
-	gl.uniformMatrix3fv(shaderProgram.getProgram().nMatrixUniform, false, normalMatrix)
-
+	shaderProgram.setUniformMatrix3fv("uNMatrix", normalMatrix)
+	
 	gl.drawElements(gl.TRIANGLES, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
 
 initializeGL = (canvas) ->

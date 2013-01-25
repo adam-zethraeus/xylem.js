@@ -2,6 +2,7 @@ class ShaderProgram
 
 	constructor: (@glContext)->
 		@program = null
+		@shaders = []
 
 	#TODO: get rid of this.
 	getShaderText: (url)->
@@ -21,40 +22,31 @@ class ShaderProgram
 		httpRequest.send()
 		return shaderText
 
-	compileShader: (shaderText, glShaderType)->
-		shader = @glContext.createShader(glShaderType)
-		@glContext.shaderSource(shader, shaderText)
-		@glContext.compileShader(shader)
-		if not @glContext.getShaderParameter(shader, @glContext.COMPILE_STATUS)
-			failure("A shader would not compile.", @glContext.getShaderInfoLog(shader))
-			return null
-		else 
-			return shader
+	compileShader: (text, type)->
+		glShader = @glContext.createShader(type)
+		@glContext.shaderSource(glShader, text)
+		@glContext.compileShader(glShader)	
+		throw "A shader would not compile." if not @glContext.getShaderParameter(glShader, @glContext.COMPILE_STATUS)
+		@shaders.push(glShader)
+
 
 	#TODO: get all of the setUniforms out of here
-	enableProgram: (vertexShader, fragmentShader)->
-		if not @glContext.getShaderParameter(vertexShader, @glContext.COMPILE_STATUS) or not @glContext.getShaderParameter(fragmentShader, @glContext.COMPILE_STATUS)
-			throw "shaders haven't been compiled"
+	enableProgram: ()->
 		@program = @glContext.createProgram()
-		@glContext.attachShader(@program, vertexShader)
-		@glContext.attachShader(@program, fragmentShader)
+		for shader in @shaders
+			throw "Shader hasn't been compiled." if not @glContext.getShaderParameter(shader, @glContext.COMPILE_STATUS)
+			@glContext.attachShader(@program, shader)	
 		@glContext.linkProgram(@program)
 		if not @glContext.getProgramParameter(@program, @glContext.LINK_STATUS)
-			failure("Could not link a program.")
-			return null
+			throw "Shader couldn't be linked."
 		@glContext.useProgram(@program)
-
+		
 		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "aVertexPosition")
 		@glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
 		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "aVertexNormal")
 		@glContext.enableVertexAttribArray(@program.vertexNormalAttribute)
 		@program.textureCoordAttribute = @glContext.getAttribLocation(@program, "aTextureCoord")
 		@glContext.enableVertexAttribArray(@program.textureCoordAttribute)
-		@program.pMatrixUniform = @glContext.getUniformLocation(@program, "uPMatrix")
-		@program.mvMatrixUniform = @glContext.getUniformLocation(@program, "uMVMatrix")
-		@program.nMatrixUniform = @glContext.getUniformLocation(@program, "uNMatrix")
-		
-		return @program
 
 	setUniform1f: (name, value)->
 		@glContext.uniform1f(@glContext.getUniformLocation(@program, name), value)
@@ -65,8 +57,9 @@ class ShaderProgram
 	setUniform3f: (name, values)->
 		@glContext.uniform3f(@glContext.getUniformLocation(@program, name), values[0], values[1], values[2])
 
-	setUniformMatrix3fv: ()->
-
+	setUniformMatrix3fv: (name, matrix)->
+		@glContext.uniformMatrix3fv(@glContext.getUniformLocation(@program, name), false, matrix)
+	
 	setUniformMatrix4fv: (name, matrix)->
 		@glContext.uniformMatrix4fv(@glContext.getUniformLocation(@program, name), false, matrix)
 
