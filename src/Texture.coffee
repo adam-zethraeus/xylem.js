@@ -16,5 +16,5 @@ class Texture
 			callback()
 		@texture.image.src = url
 
-	getTexture: ()->
+	getGLTexture: ()->
 		return @texture

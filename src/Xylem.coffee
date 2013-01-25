@@ -9,7 +9,8 @@ camera = null
 xylem = () ->
 	canvas = document.getElementById("render_canvas")
 	gl = initializeGL(canvas)
-	teapot = new Model(gl, "models/teapot.json")
+	teapot = new Model(gl)
+	teapot.loadBuffers(teapot.loadJSON("models/teapot.json"))
 	camera = new Camera()
 	camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
 	pMatrix = camera.getProjectionMatrix()
@@ -19,17 +20,18 @@ xylem = () ->
 	gl.enable(gl.DEPTH_TEST)
 	metalTexture = new Texture(gl)
 	metalTexture.setImage("textures/metal.jpg", ()->
+		teapot.setTexture(metalTexture)
 		sp = new ShaderProgram(gl)
 		frag = sp.getShaderText("shaders/blinn_phong.frag")
 		vert = sp.getShaderText("shaders/blinn_phong.vert")
 		sp.compileShader(frag, gl.FRAGMENT_SHADER)
 		sp.compileShader(vert, gl.VERTEX_SHADER)
 		sp.enableProgram()
-		draw(teapot.getBuffers(), metalTexture.getTexture(), sp, 0)
+		draw(teapot, sp, 0)
 	)
 
-draw = (buffers, glTexture, shaderProgram, rotate) ->
-	browserVersionOf("requestAnimationFrame")(()->draw(buffers, glTexture, shaderProgram, ++rotate))
+draw = (model, shaderProgram, rotate) ->
+	browserVersionOf("requestAnimationFrame")(()->draw(model, shaderProgram, ++rotate))
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
 	mat4.rotate(mvMatrix, degToRad(120 + rotate), [1, 0, -1])
@@ -38,20 +40,6 @@ draw = (buffers, glTexture, shaderProgram, rotate) ->
 
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-	gl.activeTexture(gl.TEXTURE0)
-	gl.bindTexture(gl.TEXTURE_2D, glTexture)
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPositionBuffer)
-	gl.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, buffers.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexTextureCoordBuffer)
-	gl.vertexAttribPointer(shaderProgram.getProgram().textureCoordAttribute, buffers.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0)
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexNormalBuffer)
-	gl.vertexAttribPointer(shaderProgram.getProgram().vertexNormalAttribute, buffers.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0)
-
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer)
 	
 	shaderProgram.setUniform3f("uPointLightingDiffuseColor", [0.8, 0.8, 0.8])
 	shaderProgram.setUniform1i("uUseTextures", 1);
@@ -68,7 +56,7 @@ draw = (buffers, glTexture, shaderProgram, rotate) ->
 	mat3.transpose(normalMatrix)
 	shaderProgram.setUniformMatrix3fv("uNMatrix", normalMatrix)
 	
-	gl.drawElements(gl.TRIANGLES, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
+	model.draw(shaderProgram)
 
 initializeGL = (canvas) ->
 	try

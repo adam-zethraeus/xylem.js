@@ -1,15 +1,16 @@
 class Model
 
-	constructor: (@glContext, url)->
+	constructor: (@glContext)->
 		@buffers = {
 			vertexPositionBuffer: null
 			vertexNormalBuffer: null
 			vertexTextureCoordBuffer: null
 			vertexIndexBuffer: null
 		}
-		this.loadBuffersFromJSON(url)
+		@texture = null
 
-	loadBuffersFromJSON: (url)->
+	#be rid of this
+	loadJSON: (url) ->
 		model = null
 		httpRequest = new XMLHttpRequest()
 		httpRequest.addEventListener(
@@ -26,6 +27,9 @@ class Model
 		httpRequest.open("GET", url, false)
 		httpRequest.send()
 		# Model has now been set
+		return model
+
+	loadBuffers: (model)->
 		@buffers.vertexNormalBuffer = @glContext.createBuffer();
 		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexNormalBuffer);
 		@glContext.bufferData(@glContext.ARRAY_BUFFER, new Float32Array(model.vertexNormals), @glContext.STATIC_DRAW);
@@ -53,4 +57,33 @@ class Model
 	getBuffers: ()->
 		return @buffers
 
+	setTexture: (@texture)->
+		return null
+
+	draw: (shaderProgram)->
+		@glContext.activeTexture(@glContext.TEXTURE0)
+		@glContext.bindTexture(@glContext.TEXTURE_2D, @texture.getGLTexture())
+		
+		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
+		@glContext.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, @buffers.vertexPositionBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
+		
+		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexTextureCoordBuffer)
+		@glContext.vertexAttribPointer(shaderProgram.getProgram().textureCoordAttribute, @buffers.vertexTextureCoordBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
+		
+		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexNormalBuffer)
+		@glContext.vertexAttribPointer(shaderProgram.getProgram().vertexNormalAttribute, @buffers.vertexNormalBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
+
+		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.vertexIndexBuffer)
+
+
+		@glContext.drawElements(@glContext.TRIANGLES, @buffers.vertexIndexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
+
 	#TODO: loadFromThreeJSModel: ()->
+
+
+
+
+
+
+
+
