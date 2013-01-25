@@ -42,6 +42,8 @@ class ShaderProgram
 		if not @glContext.getProgramParameter(@program, @glContext.LINK_STATUS)
 			failure("Could not link a program.")
 			return null
+		@glContext.useProgram(@program)
+
 		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "aVertexPosition")
 		@glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
 		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "aVertexNormal")
@@ -51,15 +53,41 @@ class ShaderProgram
 		@program.pMatrixUniform = @glContext.getUniformLocation(@program, "uPMatrix")
 		@program.mvMatrixUniform = @glContext.getUniformLocation(@program, "uMVMatrix")
 		@program.nMatrixUniform = @glContext.getUniformLocation(@program, "uNMatrix")
-		@program.samplerUniform = @glContext.getUniformLocation(@program, "uSampler")
-		@program.materialShininessUniform = @glContext.getUniformLocation(@program, "uMaterialShininess")
-		@program.useTexturesUniform = @glContext.getUniformLocation(@program, "uUseTextures")
-		@program.ambientColorUniform = @glContext.getUniformLocation(@program, "uAmbientColor")
-		@program.pointLightingLocationUniform = @glContext.getUniformLocation(@program, "uPointLightingLocation")
-		@program.pointLightingSpecularColorUniform = @glContext.getUniformLocation(@program, "uPointLightingSpecularColor")
-		@program.pointLightingDiffuseColorUniform = @glContext.getUniformLocation(@program, "uPointLightingDiffuseColor")
-		@glContext.useProgram(@program)
+		
 		return @program
+
+	setUniform1f: (name, value)->
+		@glContext.uniform1f(@glContext.getUniformLocation(@program, name), value)
+	
+	setUniform1i: (name, value)->
+		@glContext.uniform1i(@glContext.getUniformLocation(@program, name), value)
+	
+	setUniform3f: (name, values)->
+		@glContext.uniform3f(@glContext.getUniformLocation(@program, name), values[0], values[1], values[2])
+
+	setUniformMatrix3fv: ()->
+
+	setUniformMatrix4fv: (name, matrix)->
+		@glContext.uniformMatrix4fv(@glContext.getUniformLocation(@program, name), false, matrix)
+
 
 	getProgram: ()->
 		return @program
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

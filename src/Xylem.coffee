@@ -25,7 +25,15 @@ xylem = () ->
 		frag_comp = sp.compileShader(frag, gl.FRAGMENT_SHADER)
 		vert_comp = sp.compileShader(vert, gl.VERTEX_SHADER)
 		sp.enableProgram(vert_comp, frag_comp);
-		draw(teapot.getBuffers(), metalTexture.getTexture(), sp.getProgram())
+		sp.setUniform3f("uPointLightingDiffuseColor", [0.8, 0.8, 0.8])
+		sp.setUniform1i("uUseTextures", 1);
+		sp.setUniform3f("uPointLightingSpecularColor", [0.8, 0.8, 0.8])
+		sp.setUniform3f("uAmbientColor", [0.2, 0.2, 0.2])
+		sp.setUniform3f("uPointLightingLocation", [-10.0, 4.0, -20.0])
+		sp.setUniform1f("uMaterialShininess", 32.0)
+		sp.setUniform1i("uSampler", 0)
+
+		draw(teapot.getBuffers(), metalTexture.getTexture(), sp)
 	)
 
 draw = (buffers, glTexture, shaderProgram) ->
@@ -38,34 +46,26 @@ draw = (buffers, glTexture, shaderProgram) ->
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-	gl.uniform3f(shaderProgram.ambientColorUniform, 0.2, 0.2, 0.2)
-	gl.uniform3f(shaderProgram.pointLightingLocationUniform, -10.0, 4.0, -20.0)
-	gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, 0.8, 0.8, 0.8)
-	gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, 0.8, 0.8, 0.8)
-	gl.uniform1i(shaderProgram.useTexturesUniform, true)
-
-
 	gl.activeTexture(gl.TEXTURE0)
 	gl.bindTexture(gl.TEXTURE_2D, glTexture)
-	gl.uniform1i(shaderProgram.samplerUniform, 0)
-	gl.uniform1f(shaderProgram.materialShininessUniform, 32.0)
+	
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexPositionBuffer)
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, buffers.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, buffers.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexTextureCoordBuffer)
-	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, buffers.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(shaderProgram.getProgram().textureCoordAttribute, buffers.vertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0)
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexNormalBuffer)
-	gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, buffers.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(shaderProgram.getProgram().vertexNormalAttribute, buffers.vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0)
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.vertexIndexBuffer)
 	
-	gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
-	gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
+	gl.uniformMatrix4fv(shaderProgram.getProgram().pMatrixUniform, false, pMatrix)
+	gl.uniformMatrix4fv(shaderProgram.getProgram().mvMatrixUniform, false, mvMatrix)
 	normalMatrix = mat3.create()
 	mat4.toInverseMat3(mvMatrix, normalMatrix)
 	mat3.transpose(normalMatrix)
-	gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix)
+	gl.uniformMatrix3fv(shaderProgram.getProgram().nMatrixUniform, false, normalMatrix)
 
 	gl.drawElements(gl.TRIANGLES, buffers.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0)
 
