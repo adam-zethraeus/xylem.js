@@ -3,7 +3,7 @@ class ResourceLoader
 	#TODO: add failure callback
 
 	constructor: (loadRules, resourceReturnCallback)->
-		@barrier = new Barrier()
+		@barrier = new CallbackBarrier()
 		@resources = {}
 		for rule in loadRules
 			if rule["type"] is "image"
