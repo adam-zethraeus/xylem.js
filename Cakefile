@@ -7,7 +7,8 @@ appFiles  = [
   'Model'
   'Texture'
   'ShaderProgram'
-  'SceneObject'
+  'SceneNode'
+  'SceneGraph'
   'ResourceLoader'
 ]
 

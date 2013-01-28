@@ -42,7 +42,7 @@ xylem = (resourceMap) ->
 	gl.enable(gl.DEPTH_TEST)
 	metalTexture = new Texture(gl, resourceMap["metal_texture"])
 	teapotModel.setTexture(metalTexture)
-	teapot = new SceneObject(teapotModel)
+	teapot = new SceneNode(teapotModel)
 	teapot.translate([0, 0, -60])
 	sp = new ShaderProgram(gl)
 	sp.compileShader(resourceMap["frag_shader"], gl.FRAGMENT_SHADER)
