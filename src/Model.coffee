@@ -9,26 +9,6 @@ class Model
 		}
 		@texture = null
 
-	#be rid of this
-	loadJSON: (url) ->
-		model = null
-		httpRequest = new XMLHttpRequest()
-		httpRequest.addEventListener(
-			"readystatechange"
-			() ->
-				return null if httpRequest.readyState isnt 4
-				if httpRequest.status is 200
-					model = JSON.parse(httpRequest.responseText)
-				else
-					throw "A model could not be downloaded."
-					return null
-		)
-		# used synchronously
-		httpRequest.open("GET", url, false)
-		httpRequest.send()
-		# Model has now been set
-		return model
-
 	loadBuffers: (model)->
 		@buffers.vertexNormalBuffer = @glContext.createBuffer();
 		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexNormalBuffer);

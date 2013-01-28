@@ -4,24 +4,6 @@ class ShaderProgram
 		@program = null
 		@shaders = []
 
-	#TODO: get rid of this.
-	getShaderText: (url)->
-		shaderText = null
-		httpRequest = new XMLHttpRequest()
-		httpRequest.addEventListener(
-			"readystatechange"
-			() ->
-				return null if httpRequest.readyState isnt 4
-				if httpRequest.status is 200
-					shaderText = httpRequest.responseText
-				else
-					failure("A shader could not be downloaded.")
-					return null
-		)
-		httpRequest.open("GET", url, false)
-		httpRequest.send()
-		return shaderText
-
 	compileShader: (text, type)->
 		glShader = @glContext.createShader(type)
 		@glContext.shaderSource(glShader, text)

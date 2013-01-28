@@ -8,6 +8,7 @@ appFiles  = [
   'Texture'
   'ShaderProgram'
   'SceneObject'
+  'ResourceLoader'
 ]
 
 task 'build', 'Build single application file from source files', ->
