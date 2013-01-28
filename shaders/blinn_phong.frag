@@ -4,37 +4,37 @@
     varying vec3 vTransformedNormal;
     varying vec4 vPosition;
 
-    uniform float uMaterialShininess;
+    uniform float materialShininess;
 
-    uniform bool uUseTextures;
+    uniform bool useTextures;
 
-    uniform vec3 uAmbientColor;
+    uniform vec3 ambientColor;
 
-    uniform vec3 uPointLightingLocation;
-    uniform vec3 uPointLightingSpecularColor;
-    uniform vec3 uPointLightingDiffuseColor;
+    uniform vec3 pointLightingLocation;
+    uniform vec3 pointLightingSpecularColor;
+    uniform vec3 pointLightingDiffuseColor;
 
-    uniform sampler2D uSampler;
+    uniform sampler2D sampler;
 
 
     void main(void) {
         vec3 lightWeighting;
-            vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
+            vec3 lightDirection = normalize(pointLightingLocation - vPosition.xyz);
             vec3 normal = normalize(vTransformedNormal);
 
             vec3 eyeDirection = normalize(-vPosition.xyz);
             vec3 reflectionDirection = reflect(-lightDirection, normal);
 
-            float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), uMaterialShininess);
+            float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), materialShininess);
 
             float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0);
-            lightWeighting = uAmbientColor
-                + uPointLightingSpecularColor * specularLightWeighting
-                + uPointLightingDiffuseColor * diffuseLightWeighting;
+            lightWeighting = ambientColor
+                + pointLightingSpecularColor * specularLightWeighting
+                + pointLightingDiffuseColor * diffuseLightWeighting;
 
         vec4 fragmentColor;
-        if (uUseTextures) {
-            fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        if (useTextures) {
+            fragmentColor = texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t));
         } else {
             fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
         }

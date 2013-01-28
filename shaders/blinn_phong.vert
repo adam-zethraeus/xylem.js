@@ -1,10 +1,10 @@
-    attribute vec3 aVertexPosition;
-    attribute vec3 aVertexNormal;
-    attribute vec2 aTextureCoord;
+    attribute vec3 vertexPosition;
+    attribute vec3 vertexNormal;
+    attribute vec2 textureCoord;
 
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
-    uniform mat3 uNMatrix;
+    uniform mat4 mvMatrix;
+    uniform mat4 pMatrix;
+    uniform mat3 nMatrix;
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
@@ -12,8 +12,8 @@
 
 
     void main(void) {
-        vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-        gl_Position = uPMatrix * vPosition;
-        vTextureCoord = aTextureCoord;
-        vTransformedNormal = uNMatrix * aVertexNormal;
+        vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+        gl_Position = pMatrix * vPosition;
+        vTextureCoord = textureCoord;
+        vTransformedNormal = nMatrix * vertexNormal;
     }

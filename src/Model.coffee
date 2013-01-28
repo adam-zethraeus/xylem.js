@@ -60,7 +60,7 @@ class Model
 	setTexture: (@texture)->
 		return null
 
-	draw: (shaderProgram, useTexture = true)->
+	draw: (shaderProgram)->
 		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
 		@glContext.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, @buffers.vertexPositionBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
 		
@@ -72,9 +72,9 @@ class Model
 
 		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.vertexIndexBuffer)
 
-		@texture.bind(@glContext.TEXTURE0) if useTexture
+		@texture.bind(@glContext.TEXTURE0)
 		@glContext.drawElements(@glContext.TRIANGLES, @buffers.vertexIndexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
-		@texture.unbind() if useTexture
+		@texture.unbind()
 	#TODO: loadFromThreeJSModel: ()->
 
 

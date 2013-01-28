@@ -39,11 +39,11 @@ class ShaderProgram
 			throw "Shader couldn't be linked."
 		@glContext.useProgram(@program)
 
-		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "aVertexPosition")
+		@program.vertexPositionAttribute = @glContext.getAttribLocation(@program, "vertexPosition")
 		@glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
-		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "aVertexNormal")
+		@program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "vertexNormal")
 		@glContext.enableVertexAttribArray(@program.vertexNormalAttribute)
-		@program.textureCoordAttribute = @glContext.getAttribLocation(@program, "aTextureCoord")
+		@program.textureCoordAttribute = @glContext.getAttribLocation(@program, "textureCoord")
 		@glContext.enableVertexAttribArray(@program.textureCoordAttribute)
 
 	setUniform1f: (name, value)->
