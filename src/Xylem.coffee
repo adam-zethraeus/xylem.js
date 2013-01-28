@@ -1,8 +1,6 @@
 window.onload = () ->
 	xylem()
 
-mvMatrix = mat4.create()
-pMatrix = mat4.create()
 gl = null
 camera = null
 
@@ -13,13 +11,13 @@ xylem = () ->
 	teapot.loadBuffers(teapot.loadJSON("models/teapot.json"))
 	camera = new Camera()
 	camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
-	pMatrix = camera.getProjectionMatrix()
 	camera.translate([0,0,20])
 	camera.rotate(5, [0, 1, 0])
 	gl.clearColor(0.0, 0.0, 0.0, 1.0)
 	gl.enable(gl.DEPTH_TEST)
-	metalTexture = new Texture(gl)
-	metalTexture.setImage("textures/metal.jpg", ()->
+	textureImage = new Image()
+	textureImage.onload = () ->
+		metalTexture = new Texture(gl, textureImage)
 		teapot.setTexture(metalTexture)
 		sp = new ShaderProgram(gl)
 		frag = sp.getShaderText("shaders/blinn_phong.frag")
@@ -28,10 +26,11 @@ xylem = () ->
 		sp.compileShader(vert, gl.VERTEX_SHADER)
 		sp.enableProgram()
 		draw(teapot, sp, 0)
-	)
+	textureImage.src = "textures/metal.jpg"
 
 draw = (model, shaderProgram, rotate) ->
 	browserVersionOf("requestAnimationFrame")(()->draw(model, shaderProgram, ++rotate))
+	mvMatrix = mat4.create()
 	mat4.identity(mvMatrix)
 	mat4.translate(mvMatrix, [0, 0, -60])
 	mat4.rotate(mvMatrix, degToRad(120 + rotate), [1, 0, -1])
@@ -49,14 +48,14 @@ draw = (model, shaderProgram, rotate) ->
 	shaderProgram.setUniform1f("uMaterialShininess", 32.0)
 	shaderProgram.setUniform1i("uSampler", 0)
 
-	shaderProgram.setUniformMatrix4fv("uPMatrix", pMatrix)
+	shaderProgram.setUniformMatrix4fv("uPMatrix", camera.getProjectionMatrix())
 	shaderProgram.setUniformMatrix4fv("uMVMatrix", mvMatrix)
 	normalMatrix = mat3.create()
 	mat4.toInverseMat3(mvMatrix, normalMatrix)
 	mat3.transpose(normalMatrix)
 	shaderProgram.setUniformMatrix3fv("uNMatrix", normalMatrix)
 	
-	model.draw(shaderProgram)
+	model.draw(shaderProgram, true)
 
 initializeGL = (canvas) ->
 	try
@@ -66,12 +65,8 @@ initializeGL = (canvas) ->
 	if gl
 		return gl
 	else
-		failure("Could not initialize WebGL.", gl)
+		throw "Could not initialize WebGL."
 		return null
-
-failure = (params...) ->
-	console.log("Xylem Failure: ")
-	console.log(param) for param in params
 
 degToRad = (degrees) ->
 	return degrees * (Math.PI / 180);

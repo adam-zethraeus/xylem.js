@@ -20,7 +20,7 @@ class Model
 				if httpRequest.status is 200
 					model = JSON.parse(httpRequest.responseText)
 				else
-					failure("A model could not be downloaded.")
+					throw "A model could not be downloaded."
 					return null
 		)
 		# used synchronously
@@ -60,10 +60,7 @@ class Model
 	setTexture: (@texture)->
 		return null
 
-	draw: (shaderProgram)->
-		@glContext.activeTexture(@glContext.TEXTURE0)
-		@glContext.bindTexture(@glContext.TEXTURE_2D, @texture.getGLTexture())
-		
+	draw: (shaderProgram, useTexture = true)->
 		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
 		@glContext.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, @buffers.vertexPositionBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
 		
@@ -75,9 +72,9 @@ class Model
 
 		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.vertexIndexBuffer)
 
-
+		@texture.bind(@glContext.TEXTURE0) if useTexture
 		@glContext.drawElements(@glContext.TRIANGLES, @buffers.vertexIndexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
-
+		@texture.unbind() if useTexture
 	#TODO: loadFromThreeJSModel: ()->
 
 
