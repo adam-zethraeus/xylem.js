@@ -1,7 +1,7 @@
 class Texture
 
 	constructor: (@glContext, image)->
-		if not image.src
+		if not image.src?
 			throw "Texture image was not loaded."
 		@glTexture = @glContext.createTexture()
 		@glTexture.image = image

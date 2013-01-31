@@ -39,27 +39,29 @@ xylem = (resourceMap) ->
 	camera.translate([0,0,20])
 	camera.rotate(5, [0, 1, 0])
 	gl.clearColor(0.0, 0.0, 0.0, 1.0)
+	gl.disable(gl.BLEND)
 	gl.enable(gl.DEPTH_TEST)
+	gl.depthFunc(gl.LEQUAL)
+	gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT)
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
 	metalTexture = new Texture(gl, resourceMap["metal_texture"])
 	teapotModel.setTexture(metalTexture)
-	teapot = new SceneNode(teapotModel)
+	teapot = new SceneNode()
+	teapot.setModel(teapotModel)
 	teapot.translate([0, 0, -60])
-	sp = new ShaderProgram(gl)
-	sp.compileShader(resourceMap["frag_shader"], gl.FRAGMENT_SHADER)
-	sp.compileShader(resourceMap["vert_shader"], gl.VERTEX_SHADER)
-	sp.enableProgram()
-	draw(teapot, sp)
-
-draw = (sceneObject, shaderProgram) ->
-	browserVersionOf("requestAnimationFrame")(()->draw(sceneObject, shaderProgram))
-	mvMatrix = mat4.create()
-	sceneObject.rotate(degToRad(5), [1, 0, -1])
+	childpot = new SceneNode()
+	childpot.setModel(teapotModel)
+	childpot.translate([0, 3, 0])
+	childpot.scale([0.9, 0.9, 0.9])
+	teapot.addChild(childpot)
+	graph = new SceneGraph()
+	graph.setRoot(teapot)
 	
-	mat4.multiply(camera.getViewMatrix(), sceneObject.getModelMatrix(), mvMatrix)
+	shaderProgram = new ShaderProgram(gl)
+	shaderProgram.compileShader(resourceMap["frag_shader"], gl.FRAGMENT_SHADER)
+	shaderProgram.compileShader(resourceMap["vert_shader"], gl.VERTEX_SHADER)
+	shaderProgram.enableProgram()
 
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-	
 	shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
 	shaderProgram.setUniform1i("useTextures", 1);
 	shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
@@ -68,14 +70,15 @@ draw = (sceneObject, shaderProgram) ->
 	shaderProgram.setUniform1f("materialShininess", 32.0)
 	shaderProgram.setUniform1i("sampler", 0)
 
-	shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
-	shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
-	normalMatrix = mat3.create()
-	mat4.toInverseMat3(mvMatrix, normalMatrix)
-	mat3.transpose(normalMatrix)
-	shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
-	
-	sceneObject.draw(shaderProgram)
+	draw(graph, shaderProgram)
+
+draw = (sceneGraph, shaderProgram) ->
+	browserVersionOf("requestAnimationFrame")(()->draw(sceneGraph, shaderProgram))
+	sceneGraph.rootNode.rotate(degToRad(5), [1, 0, -1])
+
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+	sceneGraph.draw(shaderProgram, camera)
 
 initializeGL = (canvas) ->
 	try

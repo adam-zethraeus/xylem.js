@@ -1,9 +1,15 @@
 class SceneNode
-	constructor: (@graphicalModel)->
+	constructor: ()->
 		@modelMatrix = mat4.create()
-		@childNodes = []
+		@children = []
 		@parentNode = null
 		this.resetModelMatrix()
+
+	setModel: (@graphicalModel)->
+
+	getGraphicalModel: ()->
+		throw "Model not set" if not @graphicalModel?
+		return @graphicalModel
 
 	translate: (vector)->
 		mat4.translate(@modelMatrix, vector)
@@ -12,7 +18,7 @@ class SceneNode
 		mat4.rotate(@modelMatrix, degToRad(degrees), axis)
 
 	scale: (proportion) ->
-		#TODO: implement
+		mat4.scale(@modelMatrix, proportion)
 
 	resetModelMatrix: ()->
 		mat4.identity(@modelMatrix)
@@ -22,7 +28,7 @@ class SceneNode
 
 	addChild: (node)->
 		node.setParent(this)
-		@childNodes.push(node)
+		@children.push(node)
 
 	reparentTo: (node)->
 		if @parentNode
@@ -32,10 +38,14 @@ class SceneNode
 	setParent: (@parentNode)->
 
 	removeChild: (node)->
-		#TODO: implement
+		index = @children.indexOf(node)
+		return if index is -1
+		@children = @children.slice(0, index) + @children.slice(index + 1)
 
 	getChildren: ()->
-		return @childNodes
+		return @children
 
+	#TODO: refactor this out
 	draw: (shaderProgram)->
+		throw "Model not set" if not @graphicalModel?
 		@graphicalModel.draw(shaderProgram)
