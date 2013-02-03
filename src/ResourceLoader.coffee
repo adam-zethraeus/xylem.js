@@ -5,6 +5,7 @@ class ResourceLoader
 	constructor: (loadRules, resourceReturnCallback)->
 		@barrier = new CallbackBarrier()
 		@resources = {}
+		@failures = false
 		for rule in loadRules
 			if rule["type"] is "image"
 				this.loadImage(rule.name, rule.url, @barrier.getCallback())
@@ -15,7 +16,7 @@ class ResourceLoader
 			else 
 				throw "Invalid load rule type."
 		@barrier.finalize(()=>
-			resourceReturnCallback(@resources)
+			resourceReturnCallback(@resources, not @failures)
 		)
 
 	#TODO: register failure case.
@@ -23,6 +24,10 @@ class ResourceLoader
 		image = new Image()
 		image.onload = ()=>
 			@resources[name] = image
+			callback()
+		image.onerror = ()=>
+			@resources[name] = null
+			@failures = true
 			callback()
 		image.src = url
 
@@ -37,7 +42,9 @@ class ResourceLoader
 					@resources[name] = httpRequest.responseText
 					callback()
 				else
-					throw "Resource "+url+" could not be downloaded."
+					@resources[name] = null
+					@failures = true
+					callback()
 		)
 		httpRequest.open("GET", url, true)
 		httpRequest.send()
@@ -52,7 +59,9 @@ class ResourceLoader
 					@resources[name] = JSON.parse(httpRequest.responseText)
 					callback()
 				else
-					throw "Resource "+url+" could not be downloaded."
+					@resources[name] = null
+					@failures = true
+					callback()
 		)
 		httpRequest.open("GET", url, true)
 		httpRequest.send()

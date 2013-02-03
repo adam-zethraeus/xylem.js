@@ -23,13 +23,15 @@ window.onload = () ->
 				"type": "json"
 			}
 		],
-		(resourceMap)->xylem(resourceMap)
+		(resourceMap, success)->xylem(resourceMap, success)
 	)
 
 gl = null
 camera = null
 
-xylem = (resourceMap) ->
+xylem = (resourceMap, success) ->
+	if not success
+		throw "Not all necessary resources could be loaded."
 	canvas = document.getElementById("render_canvas")
 	gl = initializeGL(canvas)
 	teapotModel = new Model(gl)
