@@ -79,7 +79,6 @@ draw = (sceneGraph, shaderProgram) ->
 	sceneGraph.rootNode.rotate(degToRad(5), [1, 0, -1])
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
 	sceneGraph.draw(shaderProgram, camera)
 
 initializeGL = (canvas) ->
@@ -87,6 +86,8 @@ initializeGL = (canvas) ->
 		gl = canvas.getContext("experimental-webgl")
 		gl.viewportWidth = canvas.width
 		gl.viewportHeight = canvas.height
+		gl.enable(gl.CULL_FACE)
+		gl.cullFace(gl.BACK)
 	if gl
 		return gl
 	else
