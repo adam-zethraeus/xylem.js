@@ -5,7 +5,7 @@ class Model
 			vertexPositionBuffer: null
 			vertexNormalBuffer: null
 			vertexTextureCoordBuffer: null
-			vertexIndexBuffer: null
+			faceVertexIndexBuffer: null
 		}
 		@texture = null
 
@@ -28,11 +28,11 @@ class Model
 		@buffers.vertexPositionBuffer.itemSize = 3;
 		@buffers.vertexPositionBuffer.numItems = model.vertexPositions.length / 3;
 
-		@buffers.vertexIndexBuffer = @glContext.createBuffer();
-		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.vertexIndexBuffer);
-		@glContext.bufferData(@glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.indices), @glContext.STATIC_DRAW);
-		@buffers.vertexIndexBuffer.itemSize = 1;
-		@buffers.vertexIndexBuffer.numItems = model.indices.length;
+		@buffers.faceVertexIndexBuffer = @glContext.createBuffer();
+		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.faceVertexIndexBuffer);
+		@glContext.bufferData(@glContext.ELEMENT_ARRAY_BUFFER, new Uint16Array(model.faces), @glContext.STATIC_DRAW);
+		@buffers.faceVertexIndexBuffer.itemSize = 1;
+		@buffers.faceVertexIndexBuffer.numItems = model.faces.length;
 
 	getBuffers: ()->
 		return @buffers
@@ -50,10 +50,10 @@ class Model
 		@glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexNormalBuffer)
 		@glContext.vertexAttribPointer(shaderProgram.getProgram().vertexNormalAttribute, @buffers.vertexNormalBuffer.itemSize, @glContext.FLOAT, false, 0, 0)
 
-		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.vertexIndexBuffer)
+		@glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.faceVertexIndexBuffer)
 
 		@texture.bind(@glContext.TEXTURE0)
-		@glContext.drawElements(@glContext.TRIANGLES, @buffers.vertexIndexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
+		@glContext.drawElements(@glContext.TRIANGLES, @buffers.faceVertexIndexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
 		@texture.unbind()
 	#TODO: loadFromThreeJSModel: ()->
 
