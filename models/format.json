@@ -1,5 +1,0 @@
-//vertexPositions = [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN] //model space
-//vertexNormals = [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN] //model space
-//vertexPositions = [x0,y0,x1,y1,x2,y2,...,xN,yN] //texture space
-//faces = [triangle0.v0, triangle0.v1, triangle0.v2, ..., triangleN.v0, triangleN.v1, triangleN.v2]
-//faceColours = [triangle0.R, triangle0.G, triangle0.B, ..., triangleN.R, triangleN.G, triangleN.B]
