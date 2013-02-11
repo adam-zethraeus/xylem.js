@@ -3,13 +3,15 @@ fs     = require 'fs'
 
 appFiles  = [
   'Xylem'
-  'Camera'
   'Model'
   'Texture'
   'ShaderProgram'
   'SceneNode'
   'SceneGraph'
   'ResourceLoader'
+  'SceneObject'
+  'SceneLight'
+  'SceneCamera'
 ]
 
 task 'build', 'Build single application file from source files', ->

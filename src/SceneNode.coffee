@@ -1,15 +1,10 @@
 class SceneNode
+
 	constructor: ()->
 		@modelMatrix = mat4.create()
 		@children = []
 		@parentNode = null
 		this.resetModelMatrix()
-
-	setModel: (@graphicalModel)->
-
-	getGraphicalModel: ()->
-		throw "Model not set" if not @graphicalModel?
-		return @graphicalModel
 
 	translate: (vector)->
 		mat4.translate(@modelMatrix, vector)
@@ -44,8 +39,3 @@ class SceneNode
 
 	getChildren: ()->
 		return @children
-
-	#TODO: refactor this out
-	draw: (shaderProgram)->
-		throw "Model not set" if not @graphicalModel?
-		@graphicalModel.draw(shaderProgram)
