@@ -1,9 +1,9 @@
 class SceneObject extends SceneNode
-	constructor: ()->
-		super()
-		@graphicalModel = null
+    constructor: ()->
+        super()
+        @graphicalModel = null
 
-	setModel: (@graphicalModel)->
+    setModel: (@graphicalModel)->
 
-	getGraphicalModel: ()->
-		return @graphicalModel
+    getGraphicalModel: ()->
+        return @graphicalModel
