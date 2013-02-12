@@ -25,6 +25,8 @@ class ShaderProgram
         @glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
         @program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "vertexNormal")
         @glContext.enableVertexAttribArray(@program.vertexNormalAttribute)
+        @program.vertexColourAttribute = @glContext.getAttribLocation(@program, "vertexColour")
+        @glContext.enableVertexAttribArray(@program.vertexColourAttribute)
         @program.textureCoordAttribute = @glContext.getAttribLocation(@program, "textureCoord")
         @glContext.enableVertexAttribArray(@program.textureCoordAttribute)
 
@@ -42,7 +44,6 @@ class ShaderProgram
     
     setUniformMatrix4fv: (name, matrix)->
         @glContext.uniformMatrix4fv(@glContext.getUniformLocation(@program, name), false, matrix)
-
 
     getProgram: ()->
         return @program

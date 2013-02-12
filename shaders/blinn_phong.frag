@@ -2,14 +2,12 @@
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
+    varying vec3 vColour;
     varying vec4 vPosition;
 
     uniform float materialShininess;
-
-    uniform bool useTextures;
-
+    uniform float textureOpacity;
     uniform vec3 ambientColor;
-
     uniform vec3 pointLightingLocation;
     uniform vec3 pointLightingSpecularColor;
     uniform vec3 pointLightingDiffuseColor;
@@ -32,11 +30,6 @@
                 + pointLightingSpecularColor * specularLightWeighting
                 + pointLightingDiffuseColor * diffuseLightWeighting;
 
-        vec4 fragmentColor;
-        if (useTextures) {
-            fragmentColor = texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t));
-        } else {
-            fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
-        }
+        vec4 fragmentColor = vec4(vColour, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
         gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
     }

@@ -14,7 +14,7 @@ window.onload = () ->
                 "url" : "shaders/blinn_phong.vert",
                 "type" : "text"
             }, {
-                "name" : "teapot_json",
+                "name" : "cube_json",
                 "url" : "models/cube/model.json",
                 "type" : "json"
             }
@@ -31,7 +31,7 @@ xylem = (resourceMap, success) ->
     canvas = document.getElementById("render_canvas")
     gl = initializeGL(canvas)
     teapotModel = new Model(gl)
-    teapotModel.loadBuffers(resourceMap["teapot_json"])
+    teapotModel.loadModel(resourceMap["cube_json"])
     camera = new SceneCamera()
     camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
     camera.translate([0,0,20])
@@ -56,7 +56,6 @@ xylem = (resourceMap, success) ->
     shaderProgram.enableProgram()
 
     shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
-    shaderProgram.setUniform1i("useTextures", 0);
     shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
     shaderProgram.setUniform3f("pointLightingLocation", [-10.0, 4.0, -20.0])
@@ -67,7 +66,8 @@ xylem = (resourceMap, success) ->
 
 draw = (sceneGraph, shaderProgram) ->
     browserVersionOf("requestAnimationFrame")(()->draw(sceneGraph, shaderProgram))
-    sceneGraph.rootNode.rotate(degToRad(5), [1, 0, -1])
+    sceneGraph.rootNode.rotate(degToRad(25), [0.0, 1.0, 0.0])
+    sceneGraph.rootNode.rotate(degToRad(10), [1.0, 0.0, -1.0])
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     sceneGraph.draw(shaderProgram, camera)

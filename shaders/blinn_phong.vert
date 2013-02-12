@@ -1,5 +1,6 @@
     attribute vec3 vertexPosition;
     attribute vec3 vertexNormal;
+    attribute vec3 vertexColour;
     attribute vec2 textureCoord;
 
     uniform mat4 mvMatrix;
@@ -8,6 +9,7 @@
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
+    varying vec3 vColour;
     varying vec4 vPosition;
 
 
@@ -15,5 +17,6 @@
         vPosition = mvMatrix * vec4(vertexPosition, 1.0);
         gl_Position = pMatrix * vPosition;
         vTextureCoord = textureCoord;
+        vColour = vertexColour;
         vTransformedNormal = nMatrix * vertexNormal;
     }
