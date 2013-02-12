@@ -3,7 +3,7 @@ window.onload = () ->
         [
             {
                 "name" : "metal_texture",
-                "url" : "models/teapot/texture.jpg",
+                "url" : "textures/metal.jpg",
                 "type" : "image"
             }, {
                 "name" : "frag_shader",
@@ -15,7 +15,7 @@ window.onload = () ->
                 "type" : "text"
             }, {
                 "name" : "cube_json",
-                "url" : "models/cube/model.json",
+                "url" : "models/cube.json",
                 "type" : "json"
             }
         ],
