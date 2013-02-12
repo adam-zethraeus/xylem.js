@@ -2,21 +2,21 @@ window.onload = () ->
     rl = new ResourceLoader(
         [
             {
-                "name": "metal_texture",
-                "url": "models/teapot/texture.jpg",
-                "type": "image"
+                "name" : "metal_texture",
+                "url" : "models/teapot/texture.jpg",
+                "type" : "image"
             }, {
-                "name": "frag_shader",
-                "url": "shaders/blinn_phong.frag",
-                "type": "text"
+                "name" : "frag_shader",
+                "url" : "shaders/blinn_phong.frag",
+                "type" : "text"
             }, {
-                "name": "vert_shader",
-                "url": "shaders/blinn_phong.vert",
-                "type": "text"
+                "name" : "vert_shader",
+                "url" : "shaders/blinn_phong.vert",
+                "type" : "text"
             }, {
-                "name": "teapot_json",
-                "url": "models/teapot/model.json",
-                "type": "json"
+                "name" : "teapot_json",
+                "url" : "models/cube/model.json",
+                "type" : "json"
             }
         ],
         (resourceMap, success)->xylem(resourceMap, success)
@@ -47,11 +47,6 @@ xylem = (resourceMap, success) ->
     teapot = new SceneObject()
     teapot.setModel(teapotModel)
     teapot.translate([0, 0, -60])
-    childpot = new SceneObject()
-    childpot.setModel(teapotModel)
-    childpot.translate([0, 3, 0])
-    childpot.scale([0.9, 0.9, 0.9])
-    teapot.addChild(childpot)
     graph = new SceneGraph()
     graph.setRoot(teapot)
     
@@ -61,7 +56,7 @@ xylem = (resourceMap, success) ->
     shaderProgram.enableProgram()
 
     shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
-    shaderProgram.setUniform1i("useTextures", 1);
+    shaderProgram.setUniform1i("useTextures", 0);
     shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
     shaderProgram.setUniform3f("pointLightingLocation", [-10.0, 4.0, -20.0])
