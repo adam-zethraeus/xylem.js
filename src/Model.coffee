@@ -33,11 +33,14 @@ class Model
         @buffers.vertexPositionBuffer.itemSize = 3
         @buffers.vertexPositionBuffer.numItems = model.vertexPositions.length / 3
 
-        @buffers.vertexColourBuffer = @glContext.createBuffer()
-        @glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexColourBuffer)
-        @glContext.bufferData(@glContext.ARRAY_BUFFER, new Float32Array(model.vertexColours), @glContext.STATIC_DRAW)
-        @buffers.vertexColourBuffer.itemSize = 3
-        @buffers.vertexColourBuffer.numItems = model.vertexColours.length / 3
+        if @textureOpacity is 1.0
+            @buffers.vertexColourBuffer = @buffers.vertexNormalBuffer
+        else
+            @buffers.vertexColourBuffer = @glContext.createBuffer()
+            @glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexColourBuffer)
+            @glContext.bufferData(@glContext.ARRAY_BUFFER, new Float32Array(model.vertexColours), @glContext.STATIC_DRAW)
+            @buffers.vertexColourBuffer.itemSize = 3
+            @buffers.vertexColourBuffer.numItems = model.vertexColours.length / 3
 
         @buffers.indexBuffer = @glContext.createBuffer()
         @glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
@@ -71,7 +74,6 @@ class Model
         if @textureOpacity > 0
             @texture.bind(@glContext.TEXTURE0)
         @glContext.drawElements(@glContext.TRIANGLES, @buffers.indexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
-        # unbind texture?
 
     #TODO: loadFromThreeJSModel: ()->
 

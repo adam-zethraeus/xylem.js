@@ -1,4 +1,8 @@
-//vertexPositions = [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN] //model space
-//vertexNormals = [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN] //model space
-//texturePositions = [x0,y0,x1,y1,x2,y2,...,xN,yN] //texture space
-//faces = [triangle0.v0, triangle0.v1, triangle0.v2, ..., triangleN.v0, triangleN.v1, triangleN.v2]
+//{
+//"textureOpacity" : "0.5",
+//"vertexPositions" : [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN], //model space
+//"vertexNormals" : [x0,y0,z0,x1,y1,z1,x2,y2,z2,...,xN,yN,zN], //model space
+//"vertexColours" : [r0,g0,b0,r1,g1,b1,r2,g2,b2,...,rN,gN,bN], //colour space, IGNORED IFF textureOpacity is 1.0
+//"vertexTextureCoords" : [x0,y0,x1,y1,x2,y2,...,xN,yN], //texture space
+//"indices" : [triangle0.v0, triangle0.v1, triangle0.v2, ..., triangleN.v0, triangleN.v1, triangleN.v2]
+//}
