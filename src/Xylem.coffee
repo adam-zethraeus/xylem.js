@@ -74,7 +74,7 @@ draw = (sceneGraph, shaderProgram) ->
 
 initializeGL = (canvas) ->
     try
-        gl = canvas.getContext("experimental-webgl")
+        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
         gl.viewportWidth = canvas.width
         gl.viewportHeight = canvas.height
         gl.enable(gl.CULL_FACE)
