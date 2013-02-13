@@ -14,6 +14,10 @@ window.onload = () ->
                 "url" : "shaders/blinn_phong.vert",
                 "type" : "text"
             }, {
+                "name" : "teapot_json",
+                "url" : "models/teapot.json",
+                "type" : "json"
+            }, {
                 "name" : "cube_json",
                 "url" : "models/cube.json",
                 "type" : "json"
@@ -30,8 +34,6 @@ xylem = (resourceMap, success) ->
         throw "Not all necessary resources could be loaded."
     canvas = document.getElementById("render_canvas")
     gl = initializeGL(canvas)
-    teapotModel = new Model(gl)
-    teapotModel.loadModel(resourceMap["cube_json"])
     camera = new SceneCamera()
     camera.setProperties(90, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
     camera.translate([0,0,5])
@@ -40,12 +42,27 @@ xylem = (resourceMap, success) ->
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+
+    teapotModel = new Model(gl)
+    teapotModel.loadModel(resourceMap["teapot_json"])
     metalTexture = new Texture(gl, resourceMap["metal_texture"])
     teapotModel.setTexture(metalTexture)
     teapot = new SceneObject()
     teapot.setModel(teapotModel)
+    teapot.translate([1.5, 0.0, 0.0])
+    teapot.scale([0.1, 0.1, 0.1])
+
+    boxModel = new Model(gl)
+    boxModel.loadModel(resourceMap["cube_json"])
+    box = new SceneObject()
+    box.setModel(boxModel)
+    box.translate([-1.5, 0.0, 0.0])
+
     graph = new SceneGraph()
-    graph.setRoot(teapot)
+    root = new SceneNode()
+    root.addChild(teapot)
+    root.addChild(box)
+    graph.setRoot(root)
     
     shaderProgram = new ShaderProgram(gl)
     shaderProgram.compileShader(resourceMap["frag_shader"], gl.FRAGMENT_SHADER)
@@ -55,7 +72,7 @@ xylem = (resourceMap, success) ->
     shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
-    shaderProgram.setUniform3f("pointLightingLocation", [-10.0, 4.0, -20.0])
+    shaderProgram.setUniform3f("pointLightingLocation", [0.0, 20.0, 3.0])
     shaderProgram.setUniform1f("materialShininess", 32.0)
 
     draw(graph, shaderProgram)
