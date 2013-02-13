@@ -19,7 +19,7 @@ window.onload = () ->
                 "type" : "json"
             }
         ],
-        (resourceMap, success)->xylem(resourceMap, success)
+        (resourceMap, success) -> xylem(resourceMap, success)
     )
 
 gl = null
@@ -33,20 +33,17 @@ xylem = (resourceMap, success) ->
     teapotModel = new Model(gl)
     teapotModel.loadModel(resourceMap["cube_json"])
     camera = new SceneCamera()
-    camera.setProperties(20, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
-    camera.translate([0,0,20])
-    camera.rotate(5, [0, 1, 0])
+    camera.setProperties(90, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
+    camera.translate([0,0,5])
     gl.clearColor(0.0, 0.0, 0.0, 1.0)
     gl.disable(gl.BLEND)
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT)
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
     metalTexture = new Texture(gl, resourceMap["metal_texture"])
     teapotModel.setTexture(metalTexture)
     teapot = new SceneObject()
     teapot.setModel(teapotModel)
-    teapot.translate([0, 0, -60])
     graph = new SceneGraph()
     graph.setRoot(teapot)
     
@@ -60,12 +57,11 @@ xylem = (resourceMap, success) ->
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
     shaderProgram.setUniform3f("pointLightingLocation", [-10.0, 4.0, -20.0])
     shaderProgram.setUniform1f("materialShininess", 32.0)
-    shaderProgram.setUniform1i("sampler", 0)
-
+    
     draw(graph, shaderProgram)
 
 draw = (sceneGraph, shaderProgram) ->
-    browserVersionOf("requestAnimationFrame")(()->draw(sceneGraph, shaderProgram))
+    browserVersionOf("requestAnimationFrame")(() -> draw(sceneGraph, shaderProgram))
     sceneGraph.rootNode.rotate(degToRad(25), [0.0, 1.0, 0.0])
     sceneGraph.rootNode.rotate(degToRad(10), [1.0, 0.0, -1.0])
 

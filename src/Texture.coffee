@@ -17,7 +17,7 @@ class Texture
         return @glTexture
 
     bind: (glTextureID)->
-        @glContext.activeTexture(glTextureID)
+        @glContext.activeTexture(@glContext.TEXTURE0 + glTextureID)
         @glContext.bindTexture(@glContext.TEXTURE_2D, @glTexture)
 
     unbind: ()->
