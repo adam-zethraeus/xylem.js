@@ -1,4 +1,4 @@
-window.onload = () ->
+window.onload = ()->
     rl = new ResourceLoader(
         [
             {
@@ -23,13 +23,13 @@ window.onload = () ->
                 "type" : "json"
             }
         ],
-        (resourceMap, success) -> xylem(resourceMap, success)
+        (resourceMap, success)-> xylem(resourceMap, success)
     )
 
 gl = null
 camera = null
 
-xylem = (resourceMap, success) ->
+xylem = (resourceMap, success)->
     if not success
         throw "Not all necessary resources could be loaded."
     canvas = document.getElementById("render_canvas")
@@ -73,11 +73,11 @@ xylem = (resourceMap, success) ->
     shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
     shaderProgram.setUniform3f("pointLightingLocation", [0.0, 20.0, 3.0])
-    shaderProgram.setUniform1f("materialShininess", 32.0)
+    shaderProgram.setUniform1f("specularHardness", 32.0)
 
     draw(graph, shaderProgram)
 
-draw = (sceneGraph, shaderProgram) ->
+draw = (sceneGraph, shaderProgram)->
     browserVersionOf("requestAnimationFrame")(() -> draw(sceneGraph, shaderProgram))
     sceneGraph.rootNode.rotate(degreesToRadians(2), [0.0, 1.0, 0.0])
     sceneGraph.rootNode.rotate(degreesToRadians(1), [1.0, 0.0, -1.0])
@@ -85,7 +85,7 @@ draw = (sceneGraph, shaderProgram) ->
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     sceneGraph.draw(shaderProgram, camera)
 
-initializeGL = (canvas) ->
+initializeGL = (canvas)->
     try
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
         gl.viewportWidth = canvas.width
@@ -96,4 +96,3 @@ initializeGL = (canvas) ->
         return gl
     else
         throw "Could not initialize WebGL."
-        return null

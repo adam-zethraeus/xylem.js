@@ -5,7 +5,7 @@
     varying vec3 vColour;
     varying vec4 vPosition;
 
-    uniform float materialShininess;
+    uniform float specularHardness;
     uniform float textureOpacity;
     uniform vec3 ambientColor;
     uniform vec3 pointLightingLocation;
@@ -23,7 +23,7 @@
             vec3 eyeDirection = normalize(-vPosition.xyz);
             vec3 reflectionDirection = reflect(-lightDirection, normal);
 
-            float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), materialShininess);
+            float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
 
             float diffuseLightWeighting = max(dot(normal, lightDirection), 0.0);
             lightWeighting = ambientColor
