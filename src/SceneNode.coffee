@@ -12,9 +12,6 @@ class SceneNode
     rotate: (degrees, axis)->
         mat4.rotate(@modelMatrix, degrees, axis)
 
-    scale: (proportion) ->
-        mat4.scale(@modelMatrix, proportion)
-
     resetModelMatrix: ()->
         mat4.identity(@modelMatrix)
 

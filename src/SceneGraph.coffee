@@ -35,7 +35,7 @@ class SceneGraph
                 # Use camera view to create ModelView Matrix, set in shader.
                 mvMatrix = mat4.create()
                 mat4.multiply(camera.getViewMatrix(), cumulativeModelMatrix, mvMatrix)
-                if node.getGraphicalModel()?
+                if node instanceof SceneObject
                     shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
 
                     # Set Projection Matrix.

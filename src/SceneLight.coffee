@@ -1,4 +1,4 @@
-class SceneLight extends SceneObject
+class SceneLight extends SceneNode
 
     constructor: ()->
         super()

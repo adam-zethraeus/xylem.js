@@ -1,6 +1,6 @@
 class SceneCamera extends SceneNode
 
-    constructor: () ->
+    constructor: ()->
         super()
         @viewMatrix = mat4.create()
         @projectionMatrix = mat4.create()
