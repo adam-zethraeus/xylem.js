@@ -57,13 +57,13 @@ xylem = (resourceMap, success) ->
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
     shaderProgram.setUniform3f("pointLightingLocation", [-10.0, 4.0, -20.0])
     shaderProgram.setUniform1f("materialShininess", 32.0)
-    
+
     draw(graph, shaderProgram)
 
 draw = (sceneGraph, shaderProgram) ->
     browserVersionOf("requestAnimationFrame")(() -> draw(sceneGraph, shaderProgram))
-    sceneGraph.rootNode.rotate(degToRad(25), [0.0, 1.0, 0.0])
-    sceneGraph.rootNode.rotate(degToRad(10), [1.0, 0.0, -1.0])
+    sceneGraph.rootNode.rotate(degreesToRadians(2), [0.0, 1.0, 0.0])
+    sceneGraph.rootNode.rotate(degreesToRadians(1), [1.0, 0.0, -1.0])
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     sceneGraph.draw(shaderProgram, camera)
@@ -80,6 +80,3 @@ initializeGL = (canvas) ->
     else
         throw "Could not initialize WebGL."
         return null
-
-degToRad = (degrees) ->
-    return degrees * (Math.PI / 180);

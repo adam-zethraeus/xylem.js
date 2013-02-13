@@ -10,7 +10,7 @@ class SceneNode
         mat4.translate(@modelMatrix, vector)
     
     rotate: (degrees, axis)->
-        mat4.rotate(@modelMatrix, degToRad(degrees), axis)
+        mat4.rotate(@modelMatrix, degrees, axis)
 
     scale: (proportion) ->
         mat4.scale(@modelMatrix, proportion)

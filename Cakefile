@@ -22,11 +22,11 @@ task 'build', 'Build single application file from source files', ->
             appContents[index] = fileContents
             process() if --remaining is 0
     process = ->
-        fs.writeFile 'xylem.coffee', appContents.join('\n\n'), 'utf8', (err) ->
+        fs.writeFile 'Xylem.coffee', appContents.join('\n\n'), 'utf8', (err) ->
             throw err if err
-            exec 'coffee --compile xylem.coffee', (err, stdout, stderr) ->
+            exec 'coffee --compile Xylem.coffee', (err, stdout, stderr) ->
                 throw err if err
                 console.log stdout + stderr
-                fs.unlink 'xylem.coffee', (err) ->
+                fs.unlink 'Xylem.coffee', (err) ->
                     throw err if err
                     console.log 'Done.'
