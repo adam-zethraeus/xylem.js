@@ -19,7 +19,7 @@ window.onload = ()->
                 "type" : "json"
             }, {
                 "name" : "cube_json",
-                "url" : "models/cube.json",
+                "url" : "models/cornell_box.json",
                 "type" : "json"
             }
         ],
@@ -86,12 +86,11 @@ draw = (sceneGraph, shaderProgram)->
     sceneGraph.draw(shaderProgram, camera)
 
 initializeGL = (canvas)->
-    try
-        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-        gl.viewportWidth = canvas.width
-        gl.viewportHeight = canvas.height
-        gl.enable(gl.CULL_FACE)
-        gl.cullFace(gl.BACK)
+    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+    gl.viewportWidth = canvas.width
+    gl.viewportHeight = canvas.height
+    gl.enable(gl.CULL_FACE)
+    gl.cullFace(gl.BACK)
     if gl
         return gl
     else
