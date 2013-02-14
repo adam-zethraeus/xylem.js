@@ -12,7 +12,6 @@ appFiles  = [
     'SceneObject'
     'SceneLight'
     'SceneCamera'
-    'ProperXylem'
 ]
 
 task 'build', 'Build single application file from source files', ->

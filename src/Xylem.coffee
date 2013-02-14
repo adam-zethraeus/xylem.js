@@ -36,7 +36,7 @@ xylem = (resourceMap, success)->
     gl = initializeGL(canvas)
     camera = new SceneCamera()
     camera.setProperties(90, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
-    camera.translate([0,0,5])
+    camera.translate([0,0,6.0])
     gl.clearColor(0.0, 0.0, 0.0, 1.0)
     gl.disable(gl.BLEND)
     gl.enable(gl.DEPTH_TEST)
@@ -49,14 +49,15 @@ xylem = (resourceMap, success)->
     teapotModel.setTexture(metalTexture)
     teapot = new SceneObject()
     teapot.setModel(teapotModel)
-    teapot.translate([1.5, 0.0, 0.0])
-    teapot.scale([0.1, 0.1, 0.1])
+    teapot.translate([0.0, -3.2, -3.5])
+    teapot.scale([0.3, 0.3, 0.3])
 
     boxModel = new Model(gl)
     boxModel.loadModel(resourceMap["cube_json"])
     box = new SceneObject()
     box.setModel(boxModel)
-    box.translate([-1.5, 0.0, 0.0])
+    box.translate([0.0, 0.0, 0.0])
+    box.scale([6.0, 6.0, 6.0])
 
     graph = new SceneGraph()
     root = new SceneNode()
@@ -69,18 +70,16 @@ xylem = (resourceMap, success)->
     shaderProgram.compileShader(resourceMap["vert_shader"], gl.VERTEX_SHADER)
     shaderProgram.enableProgram()
 
-    shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
+    shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.7, 0.7, 0.7])
     shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
     shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
-    shaderProgram.setUniform3f("pointLightingLocation", [0.0, 20.0, 3.0])
+    shaderProgram.setUniform3f("pointLightingLocation", [-4, 4, -4])
     shaderProgram.setUniform1f("specularHardness", 32.0)
 
     draw(graph, shaderProgram)
 
 draw = (sceneGraph, shaderProgram)->
     browserVersionOf("requestAnimationFrame")(() -> draw(sceneGraph, shaderProgram))
-    sceneGraph.rootNode.rotate(degreesToRadians(2), [0.0, 1.0, 0.0])
-    sceneGraph.rootNode.rotate(degreesToRadians(1), [1.0, 0.0, -1.0])
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     sceneGraph.draw(shaderProgram, camera)
@@ -89,8 +88,8 @@ initializeGL = (canvas)->
     gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
     gl.viewportWidth = canvas.width
     gl.viewportHeight = canvas.height
-    gl.enable(gl.CULL_FACE)
-    gl.cullFace(gl.BACK)
+    # gl.enable(gl.CULL_FACE)
+    # gl.cullFace(gl.BACK)
     if gl
         return gl
     else
