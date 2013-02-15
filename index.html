@@ -15,6 +15,14 @@
 <script src="libraries/browserVersionOf.js"></script>
 <script src="libraries/degreesToRadians.js"></script>
 <script src="Xylem.js"></script>
+<script>
+window.onload = function(){
+	x = new Xylem(document.getElementById("render_canvas"));
+	x.loadScene(function(){
+		x.draw();
+	});
+}
+</script>
 </head>
 <body>
     <canvas id="render_canvas" width="640" height="480"></canvas>

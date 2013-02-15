@@ -1,96 +1,101 @@
-window.onload = ()->
-    rl = new ResourceLoader(
-        [
-            {
-                "name" : "metal_texture",
-                "url" : "textures/metal.jpg",
-                "type" : "image"
-            }, {
-                "name" : "frag_shader",
-                "url" : "shaders/blinn_phong.frag",
-                "type" : "text"
-            }, {
-                "name" : "vert_shader",
-                "url" : "shaders/blinn_phong.vert",
-                "type" : "text"
-            }, {
-                "name" : "teapot_json",
-                "url" : "models/teapot.json",
-                "type" : "json"
-            }, {
-                "name" : "cube_json",
-                "url" : "models/cornell_box.json",
-                "type" : "json"
-            }
-        ],
-        (resourceMap, success)-> xylem(resourceMap, success)
-    )
+class Xylem
 
-gl = null
-camera = null
+    constructor: (canvas)->
+        @glContext = null
+        @camera = null
+        @sceneGraph = null
+        @glContext = this.initializeGL(canvas)
 
-xylem = (resourceMap, success)->
-    if not success
-        throw "Not all necessary resources could be loaded."
-    canvas = document.getElementById("render_canvas")
-    gl = initializeGL(canvas)
-    camera = new SceneCamera()
-    camera.setProperties(90, gl.viewportWidth, gl.viewportHeight, 0.1, 100)
-    camera.translate([0,0,6.0])
-    gl.clearColor(0.0, 0.0, 0.0, 1.0)
-    gl.disable(gl.BLEND)
-    gl.enable(gl.DEPTH_TEST)
-    gl.depthFunc(gl.LEQUAL)
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+    initializeGL: (canvas)->
+        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+        gl.viewportWidth = canvas.width
+        gl.viewportHeight = canvas.height
+        #gl.enable(gl.CULL_FACE)
+        #gl.cullFace(gl.BACK)
+        gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        gl.disable(gl.BLEND)
+        gl.enable(gl.DEPTH_TEST)
+        gl.depthFunc(gl.LEQUAL)
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
+        if not gl
+            throw "Could not initialize WebGL."
+        else
+            return gl
 
-    teapotModel = new Model(gl)
-    teapotModel.loadModel(resourceMap["teapot_json"])
-    metalTexture = new Texture(gl, resourceMap["metal_texture"])
-    teapotModel.setTexture(metalTexture)
-    teapot = new SceneObject()
-    teapot.setModel(teapotModel)
-    teapot.translate([0.0, -3.2, -3.5])
-    teapot.scale([0.3, 0.3, 0.3])
+    loadScene: (callback)->
+        rl = new ResourceLoader(
+            [
+                {
+                    "name" : "metal_texture",
+                    "url" : "textures/metal.jpg",
+                    "type" : "image"
+                }, {
+                    "name" : "frag_shader",
+                    "url" : "shaders/blinn_phong.frag",
+                    "type" : "text"
+                }, {
+                    "name" : "vert_shader",
+                    "url" : "shaders/blinn_phong.vert",
+                    "type" : "text"
+                }, {
+                    "name" : "teapot_json",
+                    "url" : "models/teapot.json",
+                    "type" : "json"
+                }, {
+                    "name" : "cube_json",
+                    "url" : "models/cornell_box.json",
+                    "type" : "json"
+                }
+            ],
+            (resourceMap, success)=>
+                if not success
+                    throw "Not all necessary resources could be loaded."
 
-    boxModel = new Model(gl)
-    boxModel.loadModel(resourceMap["cube_json"])
-    box = new SceneObject()
-    box.setModel(boxModel)
-    box.translate([0.0, 0.0, 0.0])
-    box.scale([6.0, 6.0, 6.0])
+                @camera = new SceneCamera()
+                @camera.setProperties(90, @glContext.viewportWidth, @glContext.viewportHeight, 0.1, 100)
+                @camera.translate([0,0,6.0])
 
-    graph = new SceneGraph()
-    root = new SceneNode()
-    root.addChild(teapot)
-    root.addChild(box)
-    graph.setRoot(root)
+                teapotModel = new Model(@glContext)
+                teapotModel.loadModel(resourceMap["teapot_json"])
+                metalTexture = new Texture(@glContext, resourceMap["metal_texture"])
+                teapotModel.setTexture(metalTexture)
+                teapot = new SceneObject()
+                teapot.setModel(teapotModel)
+                teapot.translate([0.0, -3.2, -3.5])
+                teapot.scale([0.3, 0.3, 0.3])
+
+                boxModel = new Model(@glContext)
+                boxModel.loadModel(resourceMap["cube_json"])
+                box = new SceneObject()
+                box.setModel(boxModel)
+                box.translate([0.0, 0.0, 0.0])
+                box.scale([6.0, 6.0, 6.0])
+
+                @sceneGraph = new SceneGraph()
+                root = new SceneNode()
+                root.addChild(teapot)
+                root.addChild(box)
+                @sceneGraph.setRoot(root)
+                
+                @initialShaderProgram = new ShaderProgram(@glContext)
+                @initialShaderProgram.compileShader(resourceMap["frag_shader"], @glContext.FRAGMENT_SHADER)
+                @initialShaderProgram.compileShader(resourceMap["vert_shader"], @glContext.VERTEX_SHADER)
+                @initialShaderProgram.enableProgram()
+                @initialShaderProgram.setUniform3f("pointLightingDiffuseColor", [0.8, 0.8, 0.8])
+                @initialShaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
+                @initialShaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
+                @initialShaderProgram.setUniform3f("pointLightingLocation", [-4, 4, -4])
+                @initialShaderProgram.setUniform1f("specularHardness", 32.0)
+
+                callback()
+        )
     
-    shaderProgram = new ShaderProgram(gl)
-    shaderProgram.compileShader(resourceMap["frag_shader"], gl.FRAGMENT_SHADER)
-    shaderProgram.compileShader(resourceMap["vert_shader"], gl.VERTEX_SHADER)
-    shaderProgram.enableProgram()
+    draw: ()->
+        @glContext.clear(@glContext.COLOR_BUFFER_BIT | @glContext.DEPTH_BUFFER_BIT)
+        @sceneGraph.draw(@initialShaderProgram, @camera)
 
-    shaderProgram.setUniform3f("pointLightingDiffuseColor", [0.7, 0.7, 0.7])
-    shaderProgram.setUniform3f("pointLightingSpecularColor", [0.8, 0.8, 0.8])
-    shaderProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
-    shaderProgram.setUniform3f("pointLightingLocation", [-4, 4, -4])
-    shaderProgram.setUniform1f("specularHardness", 32.0)
+    mainLoop: ()->
+        this.draw()
+        browserVersionOf("requestAnimationFrame")(this.mainLoop())
 
-    draw(graph, shaderProgram)
-
-draw = (sceneGraph, shaderProgram)->
-    browserVersionOf("requestAnimationFrame")(() -> draw(sceneGraph, shaderProgram))
-
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    sceneGraph.draw(shaderProgram, camera)
-
-initializeGL = (canvas)->
-    gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-    gl.viewportWidth = canvas.width
-    gl.viewportHeight = canvas.height
-    # gl.enable(gl.CULL_FACE)
-    # gl.cullFace(gl.BACK)
-    if gl
-        return gl
-    else
-        throw "Could not initialize WebGL."
+window.Xylem = Xylem
