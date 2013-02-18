@@ -31,19 +31,19 @@ class Xylem
                     "type" : "image"
                 }, {
                     "name" : "frag_shader",
-                    "url" : "shaders/blinn_phong.frag",
+                    "url" : "shaders/blinn_phong.frag.glsl",
                     "type" : "text"
                 }, {
                     "name" : "vert_shader",
-                    "url" : "shaders/blinn_phong.vert",
+                    "url" : "shaders/blinn_phong.vert.glsl",
                     "type" : "text"
                 }, {
                     "name" : "teapot_json",
-                    "url" : "models/teapot.json",
+                    "url" : "models/teapot.model.json",
                     "type" : "json"
                 }, {
                     "name" : "cube_json",
-                    "url" : "models/cornell_box.json",
+                    "url" : "models/cornell.model.json",
                     "type" : "json"
                 }
             ],
@@ -58,9 +58,9 @@ class Xylem
                 teapotModel = new Model(@glContext)
                 teapotModel.loadModel(resourceMap["teapot_json"])
                 metalTexture = new Texture(@glContext, resourceMap["metal_texture"])
-                teapotModel.setTexture(metalTexture)
                 teapot = new SceneObject()
                 teapot.setModel(teapotModel)
+                teapot.setTexture(metalTexture)
                 teapot.translate([0.0, -3.2, -3.5])
                 teapot.scale([0.3, 0.3, 0.3])
 
@@ -96,6 +96,6 @@ class Xylem
 
     mainLoop: ()->
         this.draw()
-        browserVersionOf("requestAnimationFrame")(this.mainLoop())
+        browserVersionOf("requestAnimationFrame")(()=>this.mainLoop())
 
 window.Xylem = Xylem

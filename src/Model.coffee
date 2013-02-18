@@ -8,7 +8,6 @@ class Model
             vertexColourBuffer : null,
             indexBuffer : null,
         }
-        @texture = null
         @textureOpacity = null
 
     loadModel: (model)->
@@ -60,10 +59,7 @@ class Model
     getBuffers: ()->
         return @buffers
 
-    setTexture: (@texture)->
-        return null
-
-    draw: (shaderProgram)->
+    draw: (shaderProgram, texture)->
         shaderProgram.setUniform1f("textureOpacity", @textureOpacity)
 
         @glContext.bindBuffer(@glContext.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
@@ -81,8 +77,10 @@ class Model
         @glContext.bindBuffer(@glContext.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
 
         if @textureOpacity > 0
+            if not texture?
+                throw "A model could not be drawn without a passed texture."
             bindLocation = 0
-            @texture.bind(bindLocation)
+            texture.bind(bindLocation)
             shaderProgram.setUniform1i("sampler", bindLocation)
         @glContext.drawElements(@glContext.TRIANGLES, @buffers.indexBuffer.numItems, @glContext.UNSIGNED_SHORT, 0)
 

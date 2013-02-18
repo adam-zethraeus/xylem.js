@@ -1,0 +1,61 @@
+{
+    "resources" : [
+        {
+            "name" : "metal_texture",
+            "url" : "textures/metal.jpg",
+            "type" : "image"
+        }, {
+            "name" : "frag_shader",
+            "url" : "shaders/blinn_phong.frag.glsl",
+            "type" : "text"
+        }, {
+            "name" : "vert_shader",
+            "url" : "shaders/blinn_phong.vert.glsl",
+            "type" : "text"
+        }, {
+            "name" : "teapot_model",
+            "url" : "models/teapot.model.json",
+            "type" : "json"
+        }, {
+            "name" : "cornell_box_model",
+            "url" : "models/cornell.model.json",
+            "type" : "json"
+        }
+    ],
+    "objects" : [
+        {
+            "name" : "cornell_box",
+            "location" : [0, 0, 0],
+            "scale" : [6, 6, 6],
+            "model" : "cornell_box_model"
+        },
+        {
+            "name" : "teapot",
+            "location" : [0, -3.2, -3.5],
+            "scale" : [0.3, 0.3, 0.3],
+            "texture" : "metal_texture",
+            "model" : "cornell_box_model"
+        }
+    ],
+    "lights" : [
+        {
+            "name" : "light_1",
+            "type" : "point",
+            "location" : [-4, 4, -4],
+            "ambientColour" : [0.2, 0.2, 0.2],
+            "diffuseColour" : [0,8, 0,8, 0,8],
+            "specularColour" : [0.8, 0.8, 0.8],
+            "specularHardness" : 32
+        }
+    ],
+    "cameras" : [
+        {
+            "name" : "camera_1",
+            "fieldOfViewAngle": 90,
+            "nearPlaneDistance": 0.1,
+            "farPlaneDistance": 100,
+            "location" : [0,0,6.0],
+            "look": [0,0,-1]
+        }
+    ]
+}

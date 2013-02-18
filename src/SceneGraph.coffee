@@ -48,7 +48,7 @@ class SceneGraph
                     shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
 
                     # Draw the mesh with the set up Shader Program.
-                    node.getGraphicalModel().draw(shaderProgram)
+                    node.getGraphicalModel().draw(shaderProgram, node.getTexture())
 
                 # Return accumulated Model Matrix for use by child nodes.
                 return cumulativeModelMatrix
