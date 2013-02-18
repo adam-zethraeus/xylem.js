@@ -21,9 +21,12 @@ class Xylem
             throw "Could not initialize WebGL."
         else
             return gl
+    
+    #loadScene: (scene, callback)->
 
-    loadScene: (callback)->
-        rl = new ResourceLoader(
+    load: (callback)->
+        rl = new ResourceLoader()
+        rl.load(
             [
                 {
                     "name" : "metal_texture",

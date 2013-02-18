@@ -2,10 +2,12 @@ class ResourceLoader
     
     #TODO: add failure callback
 
-    constructor: (loadRules, resourceReturnCallback)->
+    constructor: ()->
         @barrier = new CallbackBarrier()
         @resources = {}
         @failures = false
+
+    load: (loadRules, resourceReturnCallback)->
         for rule in loadRules
             if rule["type"] is "image"
                 this.loadImage(rule.name, rule.url, @barrier.getCallback())
