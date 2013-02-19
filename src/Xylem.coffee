@@ -67,7 +67,7 @@ class Xylem
             if obj.scale?
                 node.scale(obj.scale)
             if obj.rotation?
-                node.rotate(obj.rotation)
+                node.rotate(degreesToRadians(obj.rotation.degrees), obj.rotation.axis)
             if obj.children?
                 for childObj in obj.children
                     objTraverse(node, childObj)
