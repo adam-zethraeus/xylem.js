@@ -17,10 +17,24 @@
 <script src="Xylem.js"></script>
 <script>
 window.onload = function(){
-	x = new Xylem(document.getElementById("render_canvas"));
-	x.load(function(){
-		x.mainLoop();
-	});
+    var x = new Xylem(document.getElementById("render_canvas")),
+        sceneUrl = "scenes/cornell.scene.json",
+        scene = null;
+
+    httpRequest = new XMLHttpRequest();
+        httpRequest.addEventListener("readystatechange",function(){
+            if (httpRequest.readyState !== 4) {
+                return null;
+            }
+            if (httpRequest.status === 200) {
+                scene = JSON.parse(httpRequest.responseText);
+            } else{
+                throw "Failure loading scene file.";
+            }
+        });
+        httpRequest.open("GET", sceneUrl, false); // sync
+        httpRequest.send();
+    x.loadScene(scene, function(){x.draw();});
 }
 </script>
 </head>

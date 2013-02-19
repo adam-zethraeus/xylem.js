@@ -4,14 +4,17 @@ class SceneGraph
 
     setRoot: (@rootNode)->
 
-    DFT: (act, initialData)->
+    getRoot: ()->
+        return @rootNode
+
+    preorder: (act, initialData)->
         traverse = (node, data)->
             newData = act(node, data)
             for child in node.children
                 traverse(child, newData)
         traverse(@rootNode, initialData) if @rootNode?
 
-    # Example DFT act.
+    # Example preorder act.
     #
     # The act logs all paths from root to leaf.
     # In this example the SceneNodes have an extra 'name' property.
@@ -22,12 +25,12 @@ class SceneGraph
     #   list = data.concat(node.name)
     #   console.log(list) if node.children.length is 0
     #   return list
-    # x.DFT(act, [])
+    # x.preorder(act, [])
 
     draw: (shaderProgram, camera)->
         startingModelMatrix = mat4.create()
         mat4.identity(startingModelMatrix)
-        this.DFT(
+        this.preorder(
             (node, parentModelMatrix)->
                 # Accumulate model matrix with that of parent.
                 cumulativeModelMatrix = mat4.create()

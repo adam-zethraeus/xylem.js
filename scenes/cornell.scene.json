@@ -22,6 +22,10 @@
             "type" : "json"
         }
     ],
+    "shaders" : {
+        "fragment" : "frag_shader",
+        "vertex" : "vert_shader"
+    },
     "objects" : [
         {
             "name" : "cornell_box",
@@ -34,7 +38,7 @@
             "location" : [0, -3.2, -3.5],
             "scale" : [0.3, 0.3, 0.3],
             "texture" : "metal_texture",
-            "model" : "cornell_box_model"
+            "model" : "teapot_model"
         }
     ],
     "lights" : [
@@ -43,7 +47,7 @@
             "type" : "point",
             "location" : [-4, 4, -4],
             "ambientColour" : [0.2, 0.2, 0.2],
-            "diffuseColour" : [0,8, 0,8, 0,8],
+            "diffuseColour" : [0.8, 0.8, 0.8],
             "specularColour" : [0.8, 0.8, 0.8],
             "specularHardness" : 32
         }
