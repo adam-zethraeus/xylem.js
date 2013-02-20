@@ -67,7 +67,7 @@ class Xylem
             if obj.scale?
                 node.scale(obj.scale)
             if obj.rotation?
-                node.rotate(degreesToRadians(obj.rotation.degrees), obj.rotation.axis)
+                node.rotate(degreesToRadians(getOrThrow(obj.rotation, "degrees")), getOrThrow(obj.rotation, "axis"))
             if obj.children?
                 for childObj in obj.children
                     objTraverse(node, childObj)
@@ -84,11 +84,17 @@ class Xylem
         @initialShaderProgram.enableProgram()
 
         light = getOrThrow(scene.lights, 0)
-        @initialShaderProgram.setUniform3f("pointLightingDiffuseColor", getOrThrow(light, "diffuseColour"))
-        @initialShaderProgram.setUniform3f("pointLightingSpecularColor", getOrThrow(light, "specularColour"))
-        @initialShaderProgram.setUniform3f("ambientColor", getOrThrow(light, "ambientColour"))
+        @sceneLight = new SceneLight()
+        @sceneLight.setAmbientColour(getOrThrow(light, "ambientColour"))
+        @sceneLight.setDiffuseColour(getOrThrow(light, "diffuseColour"))
+        @sceneLight.setSpecularColour(getOrThrow(light, "specularColour"))
+        @sceneLight.setSpecularHardness(getOrThrow(light, "specularHardness"))
+
+        @initialShaderProgram.setUniform3f("pointLightingDiffuseColor", @sceneLight.getDiffuseColour())
+        @initialShaderProgram.setUniform3f("pointLightingSpecularColor", @sceneLight.getSpecularColour())
+        @initialShaderProgram.setUniform3f("ambientColor", @sceneLight.getAmbientColour())
         @initialShaderProgram.setUniform3f("pointLightingLocation", getOrThrow(light, "location"))
-        @initialShaderProgram.setUniform1f("specularHardness", getOrThrow(light, "specularHardness"))
+        @initialShaderProgram.setUniform1f("specularHardness", @sceneLight.getSpecularHardness())
 
         callback()
     
