@@ -30,17 +30,38 @@
         "fragment" : "frag_shader",
         "vertex" : "vert_shader"
     },
-    "objects" : [
+    "tree" : [
         {
             "name" : "cornell_box",
-            "location" : [0, 0, 0],
+            "type" : "object",
+            "translate" : [0, 0, 0],
             "scale" : [6, 6, 6],
             "model" : "cornell_box_model",
             "children" : [
                 {
+                    "name" : "light_1",
+                    "type" : "light",
+                    "lightType" : "point",
+                    "translate" : [0, 0, 0],
+                    "ambientColour" : [0.2, 0.2, 0.2],
+                    "diffuseColour" : [0.8, 0.8, 0.8],
+                    "specularColour" : [0.8, 0.8, 0.8],
+                    "specularHardness" : 32
+                },
+                {
+                    "name" : "camera_1",
+                    "type" : "camera",
+                    "fieldOfViewAngle": 90,
+                    "nearPlaneDistance": 0.1,
+                    "farPlaneDistance": 100,
+                    "translate" : [0,0,2],
+                    "look": [0,0,-1]
+                },
+                {
                     "name" : "cuboid_1",
-                    "location" : [3, -3.6, -1],
-                    "scale" : [0.3, 0.4, 0.3],
+                    "type" : "object",
+                    "translate" : [3, -0.5, -0.5],
+                    "scale" : [0.3, 0.5, 0.3],
                     "model" : "cube_model",
                     "rotation" : {
                         "degrees" : 20,
@@ -49,43 +70,30 @@
                 },
                 {
                     "name" : "cuboid_2",
-                    "location" : [-3, -3, -3],
-                    "scale" : [0.3, 0.9, 0.3],
-                    "model" : "cube_model"
+                    "type" : "object",
+                    "translate" : [-2, -0.7, -0.4],
+                    "scale" : [0.2, 0.3, 0.2],
+                    "model" : "cube_model",
+                    "rotation" : {
+                        "degrees" : -30,
+                        "axis" : [0, 1, 0]
+                    },
+                    "children" : [
+                        {
+                            "name" : "teapot",
+                            "type" : "object",
+                            "translate" : [0, 20, 0],
+                            "scale" : [0.1, 0.07, 0.1],
+                            "texture" : "metal_texture",
+                            "model" : "teapot_model",
+                            "rotation" : {
+                                "degrees" : 200,
+                                "axis" : [0, 1, 0]
+                            }
+                        }
+                    ]
                 }
             ]
-        },
-        {
-            "name" : "teapot",
-            "location" : [3, -0.35, 0],
-            "scale" : [0.1, 0.1, 0.1],
-            "texture" : "metal_texture",
-            "model" : "teapot_model",
-            "rotation" : {
-                "degrees" : -40,
-                "axis" : [0, 1, 0]
-            }
-        }
-    ],
-    "lights" : [
-        {
-            "name" : "light_1",
-            "type" : "point",
-            "location" : [-2, 3, 0],
-            "ambientColour" : [0.2, 0.2, 0.2],
-            "diffuseColour" : [0.8, 0.8, 0.8],
-            "specularColour" : [0.8, 0.8, 0.8],
-            "specularHardness" : 32
-        }
-    ],
-    "cameras" : [
-        {
-            "name" : "camera_1",
-            "fieldOfViewAngle": 90,
-            "nearPlaneDistance": 0.1,
-            "farPlaneDistance": 100,
-            "location" : [0,0,6.0],
-            "look": [0,0,-1]
         }
     ]
 }

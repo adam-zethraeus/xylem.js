@@ -2,7 +2,6 @@ class Xylem
 
     constructor: (canvas)->
         @glContext = null
-        @camera = null
         @sceneGraph = null
         @glContext = this.initializeGL(canvas)
 
@@ -10,8 +9,8 @@ class Xylem
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
         gl.viewportWidth = canvas.width
         gl.viewportHeight = canvas.height
-        #gl.enable(gl.CULL_FACE)
-        #gl.cullFace(gl.BACK)
+        gl.enable(gl.CULL_FACE)
+        gl.cullFace(gl.BACK)
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
         gl.disable(gl.BLEND)
         gl.enable(gl.DEPTH_TEST)
@@ -41,31 +40,39 @@ class Xylem
             throw "Not all necessary resources could be loaded."
         @sceneGraph = new SceneGraph()
 
-        # Set up camera.
-        cam = getOrThrow(scene.cameras, 0)
-        @camera = new SceneCamera()
-        @camera.setProperties(
-            getOrThrow(cam, "fieldOfViewAngle"),
-            @glContext.viewportWidth,
-            @glContext.viewportHeight,
-            getOrThrow(cam, "nearPlaneDistance"),
-            getOrThrow(cam, "farPlaneDistance")
-        )
-        @camera.translate(getOrThrow(cam, "location"))
-        # TODO: Use camera look.
-
         objTraverse = (parentNode, obj)=>
-            node = new SceneObject()
+            type = getOrThrow(obj, "type")
+            node = null
+            if type is "object"
+                node = new SceneObject()
+                model = new Model(@glContext)
+                model.loadModel(resourceMap[getOrThrow(obj, "model")])
+                node.setModel(model)
+                if obj.texture?
+                    node.setTexture(new Texture(@glContext, resourceMap[obj.texture]))
+                if obj.scale?
+                    node.scale(obj.scale)
+            else if type is "light"
+                node = new SceneLight()
+                node.setAmbientColour(getOrThrow(obj, "ambientColour"))
+                node.setDiffuseColour(getOrThrow(obj, "diffuseColour"))
+                node.setSpecularColour(getOrThrow(obj, "specularColour"))
+                node.setSpecularHardness(getOrThrow(obj, "specularHardness"))
+            else if type is "camera"
+                # TODO: Use camera look.
+                node = new SceneCamera()
+                node.setProperties(
+                    getOrThrow(obj, "fieldOfViewAngle"),
+                    @glContext.viewportWidth,
+                    @glContext.viewportHeight,
+                    getOrThrow(obj, "nearPlaneDistance"),
+                    getOrThrow(obj, "farPlaneDistance")
+                )
+            else
+                throw "A node of an unsupported or unmarked type was found."
             parentNode.addChild(node)
-            model = new Model(@glContext)
-            model.loadModel(resourceMap[getOrThrow(obj, "model")])
-            node.setModel(model)
-            if obj.texture?
-                node.setTexture(new Texture(@glContext, resourceMap[obj.texture]))
-            if obj.location?
-                node.translate(obj.location)
-            if obj.scale?
-                node.scale(obj.scale)
+            if obj.translate?
+                node.translate(obj.translate)
             if obj.rotation?
                 node.rotate(degreesToRadians(getOrThrow(obj.rotation, "degrees")), getOrThrow(obj.rotation, "axis"))
             if obj.children?
@@ -73,7 +80,7 @@ class Xylem
                     objTraverse(node, childObj)
         
         @sceneGraph.setRoot(new SceneNode())
-        objs = getOrThrow(scene, "objects")
+        objs = getOrThrow(scene, "tree")
         for obj in objs
             objTraverse(@sceneGraph.getRoot(), obj)
 
@@ -83,24 +90,13 @@ class Xylem
         @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "vertex")], @glContext.VERTEX_SHADER)
         @initialShaderProgram.enableProgram()
 
-        light = getOrThrow(scene.lights, 0)
-        @sceneLight = new SceneLight()
-        @sceneLight.setAmbientColour(getOrThrow(light, "ambientColour"))
-        @sceneLight.setDiffuseColour(getOrThrow(light, "diffuseColour"))
-        @sceneLight.setSpecularColour(getOrThrow(light, "specularColour"))
-        @sceneLight.setSpecularHardness(getOrThrow(light, "specularHardness"))
-
-        @initialShaderProgram.setUniform3f("pointLightingDiffuseColor", @sceneLight.getDiffuseColour())
-        @initialShaderProgram.setUniform3f("pointLightingSpecularColor", @sceneLight.getSpecularColour())
-        @initialShaderProgram.setUniform3f("ambientColor", @sceneLight.getAmbientColour())
-        @initialShaderProgram.setUniform3f("pointLightingLocation", getOrThrow(light, "location"))
-        @initialShaderProgram.setUniform1f("specularHardness", @sceneLight.getSpecularHardness())
-
         callback()
     
+
+
     draw: ()->
         @glContext.clear(@glContext.COLOR_BUFFER_BIT | @glContext.DEPTH_BUFFER_BIT)
-        @sceneGraph.draw(@initialShaderProgram, @camera)
+        @sceneGraph.draw(@initialShaderProgram)
 
     mainLoop: ()->
         this.draw()

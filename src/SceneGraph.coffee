@@ -7,54 +7,54 @@ class SceneGraph
     getRoot: ()->
         return @rootNode
 
-    preorder: (act, initialData)->
-        traverse = (node, data)->
-            newData = act(node, data)
-            for child in node.children
-                traverse(child, newData)
-        traverse(@rootNode, initialData) if @rootNode?
-
-    # Example preorder act.
-    #
-    # The act logs all paths from root to leaf.
-    # In this example the SceneNodes have an extra 'name' property.
-    # NB: The act manipulates the passed data of its parent node 
-    # and returns the new data to be passed to its children.
-    #
-    # act = (node, data)->
-    #   list = data.concat(node.name)
-    #   console.log(list) if node.children.length is 0
-    #   return list
-    # x.preorder(act, [])
-
-    draw: (shaderProgram, camera)->
+    #TODO: actually accumulate MVM
+    getNodesOfType: (type)->
+        list = []
         startingModelMatrix = mat4.create()
         mat4.identity(startingModelMatrix)
-        this.preorder(
-            (node, parentModelMatrix)->
-                # Accumulate model matrix with that of parent.
-                cumulativeModelMatrix = mat4.create()
-                mat4.multiply(node.getModelMatrix(), parentModelMatrix, cumulativeModelMatrix)
-                # Use camera view to create ModelView Matrix, set in shader.
-                mvMatrix = mat4.create()
-                mat4.multiply(camera.getViewMatrix(), cumulativeModelMatrix, mvMatrix)
-                if node instanceof SceneObject
-                    shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
+        preOrder = (node, parentModelMatrix, type) ->
+            # Accumulate model matrix with that of parent.
+            cumulativeModelMatrix = mat4.create()
+            mat4.multiply(parentModelMatrix, node.getModelMatrix(), cumulativeModelMatrix)
+            node.cumulativeModelMatrix = cumulativeModelMatrix
+            # Use camera view to create ModelView Matrix, set in shader.
+            if node instanceof type
+                list.push(node)
+            for child in node.children
+                # continue with accumulated Model Matrix for use by child nodes.
+                preOrder(child, cumulativeModelMatrix, type)
+        preOrder(@rootNode, startingModelMatrix, type)
+        return list
 
-                    # Set Projection Matrix.
-                    shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
+    draw: (shaderProgram)->
+        startingModelMatrix = mat4.create()
+        mat4.identity(startingModelMatrix)
+        camera = this.getNodesOfType(SceneCamera)[0]
+        light = this.getNodesOfType(SceneLight)[0]
+        light.setUniforms(shaderProgram, [0,0,0])
+        preOrder = (node, parentModelMatrix) ->
+            # Accumulate model matrix with that of parent.
+            cumulativeModelMatrix = mat4.create()
+            mat4.multiply(parentModelMatrix, node.getModelMatrix(), cumulativeModelMatrix)
+            # Use camera view to create ModelView Matrix, set in shader.
+            mvMatrix = mat4.create()
+            mat4.multiply(camera.getCumulativeViewMatrix(), cumulativeModelMatrix, mvMatrix)
+            if node instanceof SceneObject
+                shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
 
-                    # Get Normal Matrix from ModelView. Set in shader.
-                    normalMatrix = mat3.create()
-                    mat4.toInverseMat3(mvMatrix, normalMatrix)
-                    mat3.transpose(normalMatrix)
-                    shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
+                # Set Projection Matrix.
+                shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
 
-                    # Draw the mesh with the set up Shader Program.
-                    node.getGraphicalModel().draw(shaderProgram, node.getTexture())
+                # Get Normal Matrix from ModelView. Set in shader.
+                normalMatrix = mat3.create()
+                mat4.toInverseMat3(mvMatrix, normalMatrix)
+                mat3.transpose(normalMatrix)
+                shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
 
-                # Return accumulated Model Matrix for use by child nodes.
-                return cumulativeModelMatrix
+                # Draw the mesh with the set up Shader Program.
+                node.getGraphicalModel().draw(shaderProgram, node.getTexture())
 
-            startingModelMatrix
-        )
+            for child in node.children
+                # continue with accumulated Model Matrix for use by child nodes.
+                preOrder(child, cumulativeModelMatrix)
+        preOrder(@rootNode, startingModelMatrix)

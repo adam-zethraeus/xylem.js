@@ -30,3 +30,10 @@ class SceneLight extends SceneNode
 
     getSpecularHardness: ()->
         return @specularHardness
+
+    setUniforms: (shaderProgram, translation)->
+        shaderProgram.setUniform3f("pointLightingDiffuseColor", @diffuseColour)
+        shaderProgram.setUniform3f("pointLightingSpecularColor", @specularColour)
+        shaderProgram.setUniform3f("ambientColor", @ambientColour)
+        shaderProgram.setUniform3f("pointLightingLocation", translation)
+        shaderProgram.setUniform1f("specularHardness", @specularHardness)
