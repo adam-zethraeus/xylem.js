@@ -4,7 +4,6 @@ class SceneCamera extends SceneNode
         super()
         @viewMatrix = mat4.create()
         @projectionMatrix = mat4.create()
-        @cumulativeModelMatrix = null
         @cumulativeViewMatrix = mat4.create()
 
     setProperties: (fov, viewportWidth, viewportHeight, nearClip, farClip)->

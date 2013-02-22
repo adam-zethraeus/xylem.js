@@ -2,6 +2,7 @@ class SceneNode
 
     constructor: ()->
         @modelMatrix = mat4.create()
+        @cumulativeModelMatrix = mat4.create()
         @children = []
         @parentNode = null
         this.resetModelMatrix()
@@ -14,9 +15,18 @@ class SceneNode
 
     resetModelMatrix: ()->
         mat4.identity(@modelMatrix)
+        mat4.identity(@cumulativeModelMatrix)
 
     getModelMatrix: ()->
         return @modelMatrix
+
+    getCumulativeModelMatrix: ()->
+        return @cumulativeModelMatrix
+
+    accumulateModelMatrix: (parentAccumulatedModelMatrix)->
+        mat4.multiply(parentAccumulatedModelMatrix, @modelMatrix, @cumulativeModelMatrix)
+        for node in @children
+            node.accumulateModelMatrix(@cumulativeModelMatrix)
 
     addChild: (node)->
         node.setParent(this)
