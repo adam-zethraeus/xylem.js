@@ -32,6 +32,15 @@
     },
     "tree" : [
         {
+            "name" : "camera_1",
+            "type" : "camera",
+            "fieldOfViewAngle": 90,
+            "nearPlaneDistance": 0.1,
+            "farPlaneDistance": 100,
+            "translate" : [0,0,6],
+            "look": [0,0,-1]
+        },
+        {
             "name" : "cornell_box",
             "type" : "object",
             "translate" : [0, 0, 0],
@@ -47,15 +56,6 @@
                     "diffuseColour" : [0.8, 0.8, 0.8],
                     "specularColour" : [0.8, 0.8, 0.8],
                     "specularHardness" : 32
-                },
-                {
-                    "name" : "camera_1",
-                    "type" : "camera",
-                    "fieldOfViewAngle": 90,
-                    "nearPlaneDistance": 0.1,
-                    "farPlaneDistance": 100,
-                    "translate" : [0,0,2],
-                    "look": [0,0,-1]
                 },
                 {
                     "name" : "cuboid_1",

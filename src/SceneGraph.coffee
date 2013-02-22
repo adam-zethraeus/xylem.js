@@ -29,18 +29,19 @@ class SceneGraph
         startingModelMatrix = mat4.create()
         mat4.identity(startingModelMatrix)
         @rootNode.accumulateModelMatrix(startingModelMatrix)
-
         camera = this.getNodesOfType(SceneCamera)[0]
         light = this.getNodesOfType(SceneLight)[0]
+        #vPosition = mvMatrix * vec4(vertexPosition, 1.0);
         light.setUniforms(shaderProgram, [0,0,0])
         this.actOnNodesOfType(SceneObject, (object)->
             mvMatrix = mat4.create()
-            mat4.multiply(camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix(), mvMatrix)
+            mat4.multiply(mvMatrix, camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix())
             shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
             shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
             normalMatrix = mat3.create()
-            mat4.toInverseMat3(mvMatrix, normalMatrix)
-            mat3.transpose(normalMatrix)
+            mat3.fromMat4(normalMatrix, mvMatrix)
+            mat3.invert(normalMatrix, normalMatrix)
+            mat3.transpose(normalMatrix, normalMatrix)
             shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
             object.getGraphicalModel().draw(shaderProgram, object.getTexture())
         )

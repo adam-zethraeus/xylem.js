@@ -6,7 +6,7 @@ class SceneObject extends SceneNode
         @texture = null
 
     scale: (proportion)->
-        mat4.scale(@modelMatrix, proportion)
+        mat4.scale(@modelMatrix, @modelMatrix, proportion)
 
     setModel: (@graphicalModel)->
 

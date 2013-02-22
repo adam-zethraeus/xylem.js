@@ -8,10 +8,10 @@ class SceneNode
         this.resetModelMatrix()
 
     translate: (vector)->
-        mat4.translate(@modelMatrix, vector)
+        mat4.translate(@modelMatrix, @modelMatrix, vector)
     
     rotate: (degrees, axis)->
-        mat4.rotate(@modelMatrix, degrees, axis)
+        mat4.rotate(@modelMatrix, @modelMatrix, degrees, axis)
 
     resetModelMatrix: ()->
         mat4.identity(@modelMatrix)
@@ -24,7 +24,7 @@ class SceneNode
         return @cumulativeModelMatrix
 
     accumulateModelMatrix: (parentAccumulatedModelMatrix)->
-        mat4.multiply(parentAccumulatedModelMatrix, @modelMatrix, @cumulativeModelMatrix)
+        mat4.multiply(@cumulativeModelMatrix, parentAccumulatedModelMatrix, @modelMatrix)
         for node in @children
             node.accumulateModelMatrix(@cumulativeModelMatrix)
 

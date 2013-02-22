@@ -62,7 +62,7 @@ class Xylem
                 # TODO: Use camera look.
                 node = new SceneCamera()
                 node.setProperties(
-                    getOrThrow(obj, "fieldOfViewAngle"),
+                    degreesToRadians(getOrThrow(obj, "fieldOfViewAngle")),
                     @glContext.viewportWidth,
                     @glContext.viewportHeight,
                     getOrThrow(obj, "nearPlaneDistance"),

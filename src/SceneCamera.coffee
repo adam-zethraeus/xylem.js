@@ -7,7 +7,7 @@ class SceneCamera extends SceneNode
         @cumulativeViewMatrix = mat4.create()
 
     setProperties: (fov, viewportWidth, viewportHeight, nearClip, farClip)->
-        mat4.perspective(fov, viewportWidth / viewportHeight, nearClip, farClip, @projectionMatrix)
+        mat4.perspective(@projectionMatrix, fov, viewportWidth / viewportHeight, nearClip, farClip)
 
     getProjectionMatrix: ()->
         return @projectionMatrix
@@ -17,9 +17,8 @@ class SceneCamera extends SceneNode
         return @viewMatrix
 
     recalculateViewMatrix: ()->
-        mat4.inverse(@modelMatrix, @viewMatrix)
+        mat4.invert(@viewMatrix, @modelMatrix)
 
     getCumulativeViewMatrix: ()->
-        # This class doesn't track @cumulative
-        mat4.inverse(@cumulativeModelMatrix, @cumulativeViewMatrix)
+        mat4.invert(@cumulativeViewMatrix, @cumulativeModelMatrix)
         return @cumulativeViewMatrix
