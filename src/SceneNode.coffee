@@ -5,7 +5,7 @@ class SceneNode
         @cumulativeModelMatrix = mat4.create()
         @children = []
         @parentNode = null
-        this.resetModelMatrix()
+        @resetModelMatrix()
 
     translate: (vector)->
         mat4.translate(@modelMatrix, @modelMatrix, vector)
@@ -29,13 +29,13 @@ class SceneNode
             node.accumulateModelMatrix(@cumulativeModelMatrix)
 
     addChild: (node)->
-        node.setParent(this)
+        node.setParent(@)
         @children.push(node)
 
     reparentTo: (node)->
         if @parentNode
-            @parentNode.removeChild(this)
-        node.addChild(this)
+            @parentNode.removeChild(@)
+        node.addChild(@)
 
     setParent: (@parentNode)->
 

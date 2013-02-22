@@ -13,7 +13,7 @@ class SceneCamera extends SceneNode
         return @projectionMatrix
 
     getViewMatrix: ()->
-        this.recalculateViewMatrix()
+        @recalculateViewMatrix()
         return @viewMatrix
 
     recalculateViewMatrix: ()->

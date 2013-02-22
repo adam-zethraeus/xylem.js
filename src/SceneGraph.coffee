@@ -29,17 +29,16 @@ class SceneGraph
         startingModelMatrix = mat4.create()
         mat4.identity(startingModelMatrix)
         @rootNode.accumulateModelMatrix(startingModelMatrix)
-        camera = this.getNodesOfType(SceneCamera)[0]
-        light = this.getNodesOfType(SceneLight)[0]
+        camera = @getNodesOfType(SceneCamera)[0]
+        light = @getNodesOfType(SceneLight)[0]
         origin = vec4.fromValues(0, 0, 0, 1)
         pos = vec4.create()
         lightMvMatrix = mat4.create()
         mat4.multiply(lightMvMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
         vec4.transformMat4(pos, origin, lightMvMatrix)
         #vPosition = mvMatrix * vec4(vertexPosition, 1.0);
-        console.log(pos)
         light.setUniforms(shaderProgram, [pos[0], pos[1], pos[2]])
-        this.actOnNodesOfType(SceneObject, (object)->
+        @actOnNodesOfType(SceneObject, (object)->
             mvMatrix = mat4.create()
             mat4.multiply(mvMatrix, camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix())
             shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)

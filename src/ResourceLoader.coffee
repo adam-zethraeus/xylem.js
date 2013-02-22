@@ -10,11 +10,11 @@ class ResourceLoader
     load: (loadRules, resourceReturnCallback)->
         for rule in loadRules
             if rule["type"] is "image"
-                this.loadImage(rule.name, rule.url, @barrier.getCallback())
+                @loadImage(rule.name, rule.url, @barrier.getCallback())
             else if rule["type"] is "text"
-                this.loadText(rule.name, rule.url, @barrier.getCallback())
+                @loadText(rule.name, rule.url, @barrier.getCallback())
             else if rule["type"] is "json"
-                this.loadJSON(rule.name, rule.url, @barrier.getCallback())
+                @loadJSON(rule.name, rule.url, @barrier.getCallback())
             else 
                 throw "Invalid load rule type."
         @barrier.finalize(()=>

@@ -3,7 +3,7 @@ class Xylem
     constructor: (canvas)->
         @glContext = null
         @sceneGraph = null
-        @glContext = this.initializeGL(canvas)
+        @glContext = @initializeGL(canvas)
 
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
@@ -22,10 +22,10 @@ class Xylem
             return gl
 
     loadScene: (scene, callback)->
-        this.loadSceneResources(
+        @loadSceneResources(
             scene,
             (map, success)=>
-                this.setUpScene(scene, map, success, callback)
+                @setUpScene(scene, map, success, callback)
         )
 
     loadSceneResources: (scene, callback)->
@@ -96,7 +96,7 @@ class Xylem
         @sceneGraph.draw(@initialShaderProgram)
 
     mainLoop: ()->
-        this.draw()
-        browserVersionOf("requestAnimationFrame")(()=>this.mainLoop())
+        @draw()
+        browserVersionOf("requestAnimationFrame")(()=>@mainLoop())
 
 window.Xylem = Xylem
