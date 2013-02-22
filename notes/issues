@@ -1,2 +1,2 @@
-* Light location appears to be relative to camera.
 * Child object location isn't relative to parent.
+* Lighting is in camera space.

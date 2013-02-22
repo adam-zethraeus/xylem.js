@@ -34,10 +34,10 @@
         {
             "name" : "camera_1",
             "type" : "camera",
-            "fieldOfViewAngle": 90,
+            "fieldOfViewAngle": 60,
             "nearPlaneDistance": 0.1,
             "farPlaneDistance": 100,
-            "translate" : [0,0,6],
+            "translate" : [0,0,10],
             "look": [0,0,-1]
         },
         {
@@ -51,7 +51,7 @@
                     "name" : "light_1",
                     "type" : "light",
                     "lightType" : "point",
-                    "translate" : [0, 0, 0],
+                    "translate" : [-0.4, 0.2, 0.4],
                     "ambientColour" : [0.2, 0.2, 0.2],
                     "diffuseColour" : [0.8, 0.8, 0.8],
                     "specularColour" : [0.8, 0.8, 0.8],
@@ -60,7 +60,7 @@
                 {
                     "name" : "cuboid_1",
                     "type" : "object",
-                    "translate" : [3, -0.5, -0.5],
+                    "translate" : [2, -1.2, -1.5],
                     "scale" : [0.3, 0.5, 0.3],
                     "model" : "cube_model",
                     "rotation" : {
@@ -71,7 +71,7 @@
                 {
                     "name" : "cuboid_2",
                     "type" : "object",
-                    "translate" : [-2, -0.7, -0.4],
+                    "translate" : [-2, -2.5, -0.4],
                     "scale" : [0.2, 0.3, 0.2],
                     "model" : "cube_model",
                     "rotation" : {

@@ -59,7 +59,6 @@ class Xylem
                 node.setSpecularColour(getOrThrow(obj, "specularColour"))
                 node.setSpecularHardness(getOrThrow(obj, "specularHardness"))
             else if type is "camera"
-                # TODO: Use camera look.
                 node = new SceneCamera()
                 node.setProperties(
                     degreesToRadians(getOrThrow(obj, "fieldOfViewAngle")),
@@ -92,8 +91,6 @@ class Xylem
 
         callback()
     
-
-
     draw: ()->
         @glContext.clear(@glContext.COLOR_BUFFER_BIT | @glContext.DEPTH_BUFFER_BIT)
         @sceneGraph.draw(@initialShaderProgram)
