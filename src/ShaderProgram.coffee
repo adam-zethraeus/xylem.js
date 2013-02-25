@@ -25,8 +25,8 @@ class ShaderProgram
         @glContext.enableVertexAttribArray(@program.vertexPositionAttribute)
         @program.vertexNormalAttribute = @glContext.getAttribLocation(@program, "vertexNormal")
         @glContext.enableVertexAttribArray(@program.vertexNormalAttribute)
-        @program.vertexColourAttribute = @glContext.getAttribLocation(@program, "vertexColour")
-        @glContext.enableVertexAttribArray(@program.vertexColourAttribute)
+        @program.vertexColorAttribute = @glContext.getAttribLocation(@program, "vertexColor")
+        @glContext.enableVertexAttribArray(@program.vertexColorAttribute)
         @program.textureCoordAttribute = @glContext.getAttribLocation(@program, "textureCoord")
         @glContext.enableVertexAttribArray(@program.textureCoordAttribute)
 

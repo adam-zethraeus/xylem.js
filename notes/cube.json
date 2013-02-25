@@ -74,7 +74,7 @@
                 -1.0,  0.0,  0.0,
                 -1.0,  0.0,  0.0
             ],
-    "vertexColours" : [
+    "vertexColors" : [
                 // Front face
                 1.0, 1.0,  1.0,
                 1.0, 1.0,  1.0,

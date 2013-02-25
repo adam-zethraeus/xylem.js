@@ -52,9 +52,9 @@
                     "type" : "light",
                     "lightType" : "point",
                     "translate" : [-0.4, 0.2, 0.4],
-                    "ambientColour" : [0.2, 0.2, 0.2],
-                    "diffuseColour" : [0.8, 0.8, 0.8],
-                    "specularColour" : [0.8, 0.8, 0.8],
+                    "ambientColor" : [0.2, 0.2, 0.2],
+                    "diffuseColor" : [0.8, 0.8, 0.8],
+                    "specularColor" : [0.8, 0.8, 0.8],
                     "specularHardness" : 32
                 },
                 {

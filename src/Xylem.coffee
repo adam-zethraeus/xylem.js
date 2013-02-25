@@ -54,9 +54,9 @@ class Xylem
                     node.scale(obj.scale)
             else if type is "light"
                 node = new SceneLight()
-                node.setAmbientColour(getOrThrow(obj, "ambientColour"))
-                node.setDiffuseColour(getOrThrow(obj, "diffuseColour"))
-                node.setSpecularColour(getOrThrow(obj, "specularColour"))
+                node.setAmbientColor(getOrThrow(obj, "ambientColor"))
+                node.setDiffuseColor(getOrThrow(obj, "diffuseColor"))
+                node.setSpecularColor(getOrThrow(obj, "specularColor"))
                 node.setSpecularHardness(getOrThrow(obj, "specularHardness"))
             else if type is "camera"
                 node = new SceneCamera()

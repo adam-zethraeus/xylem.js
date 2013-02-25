@@ -6,25 +6,25 @@ class SceneLight extends SceneNode
             @type = type
         else
             @type = "point"
-        @ambientColour = null
-        @diffuseColour = null
-        @specularColour = null
+        @ambientColor = null
+        @diffuseColor = null
+        @specularColor = null
         @specularHardness = null
 
-    setAmbientColour: (@ambientColour)->
+    setAmbientColor: (@ambientColor)->
 
-    getAmbientColour: ()->
-        return @ambientColour
+    getAmbientColor: ()->
+        return @ambientColor
 
-    setDiffuseColour: (@diffuseColour)->
+    setDiffuseColor: (@diffuseColor)->
 
-    getDiffuseColour: ()->
-        return @diffuseColour
+    getDiffuseColor: ()->
+        return @diffuseColor
 
-    setSpecularColour: (@specularColour)->
+    setSpecularColor: (@specularColor)->
 
-    getSpecularColour: ()->
-        return @specularColour
+    getSpecularColor: ()->
+        return @specularColor
 
     setSpecularHardness: (@specularHardness)->
 
@@ -32,8 +32,8 @@ class SceneLight extends SceneNode
         return @specularHardness
 
     setUniforms: (shaderProgram, translation)->
-        shaderProgram.setUniform3f("pointLightingDiffuseColor", @diffuseColour)
-        shaderProgram.setUniform3f("pointLightingSpecularColor", @specularColour)
-        shaderProgram.setUniform3f("ambientColor", @ambientColour)
+        shaderProgram.setUniform3f("pointLightingDiffuseColor", @diffuseColor)
+        shaderProgram.setUniform3f("pointLightingSpecularColor", @specularColor)
+        shaderProgram.setUniform3f("ambientColor", @ambientColor)
         shaderProgram.setUniform3f("pointLightingLocation", translation)
         shaderProgram.setUniform1f("specularHardness", @specularHardness)

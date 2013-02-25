@@ -2,7 +2,7 @@
 
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
-    varying vec3 vColour;
+    varying vec3 vColor;
     varying vec4 vPosition;
 
     uniform float specularHardness;
@@ -30,6 +30,6 @@
                 + pointLightingSpecularColor * specularLightWeighting
                 + pointLightingDiffuseColor * diffuseLightWeighting;
 
-        vec4 fragmentColor = vec4(vColour, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
+        vec4 fragmentColor = vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
         gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
     }
