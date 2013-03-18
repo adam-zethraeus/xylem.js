@@ -1,2 +1,0 @@
-* Texture should be reusable in FramebufferObject
-* FBO should abstract size so viewport doesn't need to be power of 2.
