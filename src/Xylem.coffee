@@ -1,9 +1,9 @@
 class Xylem
 
     constructor: (canvas)->
-        @glContext = null
+        @gl = null
         @sceneGraph = null
-        @glContext = @initializeGL(canvas)
+        @gl = @initializeGL(canvas)
 
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
@@ -45,11 +45,11 @@ class Xylem
             node = null
             if type is "object"
                 node = new SceneObject()
-                model = new Model(@glContext)
+                model = new Model(@gl)
                 model.loadModel(resourceMap[getOrThrow(obj, "model")])
                 node.setModel(model)
                 if obj.texture?
-                    node.setTexture(new Texture(@glContext, resourceMap[obj.texture]))
+                    node.setTexture(new Texture(@gl, resourceMap[obj.texture]))
                 if obj.scale?
                     node.scale(obj.scale)
             else if type is "light"
@@ -62,8 +62,8 @@ class Xylem
                 node = new SceneCamera()
                 node.setProperties(
                     degreesToRadians(getOrThrow(obj, "fieldOfViewAngle")),
-                    @glContext.viewportWidth,
-                    @glContext.viewportHeight,
+                    @gl.viewportWidth,
+                    @gl.viewportHeight,
                     getOrThrow(obj, "nearPlaneDistance"),
                     getOrThrow(obj, "farPlaneDistance")
                 )
@@ -83,16 +83,16 @@ class Xylem
         for obj in objs
             objTraverse(@sceneGraph.getRoot(), obj)
 
-        @initialShaderProgram = new ShaderProgram(@glContext)
+        @initialShaderProgram = new ShaderProgram(@gl)
 
-        @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "fragment")], @glContext.FRAGMENT_SHADER)
-        @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "vertex")], @glContext.VERTEX_SHADER)
+        @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
+        @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
         @initialShaderProgram.enableProgram()
 
         callback()
     
     draw: ()->
-        @glContext.clear(@glContext.COLOR_BUFFER_BIT | @glContext.DEPTH_BUFFER_BIT)
+        @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
         @sceneGraph.draw(@initialShaderProgram)
 
     mainLoop: ()->
