@@ -28,7 +28,7 @@ window.onload = function(){
             }
             if (httpRequest.status === 200) {
                 scene = JSON.parse(httpRequest.responseText);
-            } else{
+            } else {
                 throw "Failure loading scene file.";
             }
         });
