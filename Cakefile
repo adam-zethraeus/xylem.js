@@ -13,6 +13,7 @@ appFiles  = [
     'SceneLight'
     'SceneCamera'
     'GetOrThrow'
+    'FullscreenQuad'
 ]
 
 task 'build', 'Build single application file from source files', ->

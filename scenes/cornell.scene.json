@@ -24,6 +24,14 @@
             "name" : "cube_model",
             "url" : "models/cube.model.json",
             "type" : "json"
+        }, {
+            "name" : "blit_frag",
+            "url" : "shaders/blit.frag.glsl",
+            "type" : "text"
+        }, {
+            "name" : "blit_vert",
+            "url" : "shaders/blit.vert.glsl",
+            "type" : "text"
         }
     ],
     "shaders" : {

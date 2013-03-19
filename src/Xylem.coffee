@@ -38,6 +38,21 @@ class Xylem
     setUpScene: (scene, resourceMap, loadSuccessful, callback)->
         if not loadSuccessful
             throw "Not all necessary resources could be loaded."
+        # t = new Texture.fromImage(@gl, resourceMap["metal_texture"])
+        # s = new ShaderProgram(@gl)
+        # q = new FullscreenQuad(@gl)
+        # s.compileShader(resourceMap["blit_frag"], @gl.FRAGMENT_SHADER)
+        # s.compileShader(resourceMap["blit_vert"], @gl.VERTEX_SHADER)
+        # s.enableProgram()
+        # s.enableAttribute("vertexPosition")
+        # s.enableAttribute("textureCoord")
+        # @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
+        # t.bind(0)
+        # s.setUniform1i("sampler", 0)
+        # q.draw(s)
+        # t.unbind(0)
+        # return
+
         @sceneGraph = new SceneGraph()
 
         objTraverse = (parentNode, obj)=>
