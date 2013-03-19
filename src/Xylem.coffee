@@ -49,7 +49,7 @@ class Xylem
                 model.loadModel(resourceMap[getOrThrow(obj, "model")])
                 node.setModel(model)
                 if obj.texture?
-                    node.setTexture(new Texture(@gl, resourceMap[obj.texture]))
+                    node.setTexture(new Texture.fromImage(@gl, resourceMap[obj.texture]))
                 if obj.scale?
                     node.scale(obj.scale)
             else if type is "light"
@@ -84,7 +84,6 @@ class Xylem
             objTraverse(@sceneGraph.getRoot(), obj)
 
         @initialShaderProgram = new ShaderProgram(@gl)
-
         @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
         @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
         @initialShaderProgram.enableProgram()

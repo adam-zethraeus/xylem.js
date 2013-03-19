@@ -76,15 +76,15 @@ class Model
 
         @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
 
+        bindLocation = 0
         if @textureOpacity > 0
             if not texture?
                 throw "A model could not be drawn without a passed texture."
-            bindLocation = 0
             texture.bind(bindLocation)
             shaderProgram.setUniform1i("sampler", bindLocation)
         @gl.drawElements(@gl.TRIANGLES, @buffers.indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
-
-    #TODO: loadFromThreeJSModel: ()->
+        if @textureOpacity > 0
+            texture.unbind(0)
 
 
 
