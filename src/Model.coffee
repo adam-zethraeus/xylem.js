@@ -61,21 +61,15 @@ class Model
 
     draw: (shaderProgram, texture)->
         shaderProgram.setUniform1f("textureOpacity", @textureOpacity)
-
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexPosition"), @buffers.vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-        
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexTextureCoordBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("textureCoord"), @buffers.vertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-        
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexNormalBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexNormal"), @buffers.vertexNormalBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexColorBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexColor"), @buffers.vertexColorBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-
         @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
-
         bindLocation = 0
         if @textureOpacity > 0
             if not texture?
