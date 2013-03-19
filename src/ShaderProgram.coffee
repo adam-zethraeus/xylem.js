@@ -3,6 +3,7 @@ class ShaderProgram
     constructor: (@gl)->
         @program = null
         @shaders = []
+        @attributes = {}
 
     compileShader: (text, type)->
         glShader = @gl.createShader(type)
@@ -21,14 +22,14 @@ class ShaderProgram
             throw "Shader couldn't be linked."
         @gl.useProgram(@program)
 
-        @program.vertexPositionAttribute = @gl.getAttribLocation(@program, "vertexPosition")
-        @gl.enableVertexAttribArray(@program.vertexPositionAttribute)
-        @program.vertexNormalAttribute = @gl.getAttribLocation(@program, "vertexNormal")
-        @gl.enableVertexAttribArray(@program.vertexNormalAttribute)
-        @program.vertexColorAttribute = @gl.getAttribLocation(@program, "vertexColor")
-        @gl.enableVertexAttribArray(@program.vertexColorAttribute)
-        @program.textureCoordAttribute = @gl.getAttribLocation(@program, "textureCoord")
-        @gl.enableVertexAttribArray(@program.textureCoordAttribute)
+    enableAttribute: (name)->
+        if !@program
+            throw "you must first enable the program."
+        @attributes[name] = @gl.getAttribLocation(@program, name)
+        @gl.enableVertexAttribArray(@attributes[name])
+
+    getAttribute: (name)->
+        return @attributes[name]
 
     setUniform1f: (name, value)->
         @gl.uniform1f(@gl.getUniformLocation(@program, name), value)
@@ -44,9 +45,6 @@ class ShaderProgram
     
     setUniformMatrix4fv: (name, matrix)->
         @gl.uniformMatrix4fv(@gl.getUniformLocation(@program, name), false, matrix)
-
-    getProgram: ()->
-        return @program
 
 
 

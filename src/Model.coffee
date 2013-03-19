@@ -63,16 +63,16 @@ class Model
         shaderProgram.setUniform1f("textureOpacity", @textureOpacity)
 
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
-        @gl.vertexAttribPointer(shaderProgram.getProgram().vertexPositionAttribute, @buffers.vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
+        @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexPosition"), @buffers.vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
         
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexTextureCoordBuffer)
-        @gl.vertexAttribPointer(shaderProgram.getProgram().textureCoordAttribute, @buffers.vertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
+        @gl.vertexAttribPointer(shaderProgram.getAttribute("textureCoord"), @buffers.vertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
         
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexNormalBuffer)
-        @gl.vertexAttribPointer(shaderProgram.getProgram().vertexNormalAttribute, @buffers.vertexNormalBuffer.itemSize, @gl.FLOAT, false, 0, 0)
+        @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexNormal"), @buffers.vertexNormalBuffer.itemSize, @gl.FLOAT, false, 0, 0)
 
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexColorBuffer)
-        @gl.vertexAttribPointer(shaderProgram.getProgram().vertexColorAttribute, @buffers.vertexColorBuffer.itemSize, @gl.FLOAT, false, 0, 0)
+        @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexColor"), @buffers.vertexColorBuffer.itemSize, @gl.FLOAT, false, 0, 0)
 
         @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
 
@@ -84,7 +84,7 @@ class Model
             shaderProgram.setUniform1i("sampler", bindLocation)
         @gl.drawElements(@gl.TRIANGLES, @buffers.indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
         if @textureOpacity > 0
-            texture.unbind(0)
+            texture.unbind(bindLocation)
 
 
 
