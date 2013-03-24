@@ -18,17 +18,20 @@ class Texture
         @gl.activeTexture(@gl.TEXTURE0 + (number || 0))
         @gl.bindTexture(@gl.TEXTURE_2D, null)
 
-    drawTo: (drawCallback)->
+    drawTo: (drawCallback, useDepth)->
+        if not useDepth?
+            useDepth = true
         hold = @gl.getParameter(@gl.VIEWPORT)
         framebuffer = @gl.createFramebuffer()
-        renderbuffer = @gl.createRenderbuffer()
         @gl.bindFramebuffer(@gl.FRAMEBUFFER, framebuffer)
-        @gl.bindRenderbuffer(@gl.RENDERBUFFER, renderbuffer)
-        renderbuffer.width = @width
-        renderbuffer.height = @height
-        @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, @width, @height)
         @gl.framebufferTexture2D(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0, @gl.TEXTURE_2D, @id, 0)
-        @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, renderbuffer)
+        if useDepth
+            renderbuffer = @gl.createRenderbuffer()
+            @gl.bindRenderbuffer(@gl.RENDERBUFFER, renderbuffer)
+            renderbuffer.width = @width
+            renderbuffer.height = @height
+            @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, @width, @height)
+            @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, renderbuffer)
         @gl.viewport(0, 0, @width, @height)
 
         drawCallback()
