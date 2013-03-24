@@ -37,6 +37,17 @@ class Texture
         @gl.bindRenderbuffer(@gl.RENDERBUFFER, null)
         @gl.viewport(hold[0], hold[1], hold[2], hold[3])
 
+    swapContents: (texture)->
+        hold = texture.id
+        texture.id = @id
+        @id = hold
+        hold = texture.width
+        texture.width = @width
+        @width = hold
+        hold = texture.height
+        texture.height = @height
+        @height = hold
+
 Texture.fromImage = (gl, image)->
     texture = new Texture(gl, image.width, image.height)
     gl.bindTexture(gl.TEXTURE_2D, texture.id)
