@@ -7,6 +7,7 @@ class Texture
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR)
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR_MIPMAP_NEAREST)
         @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @width, @height, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null)
+        @gl.generateMipmap(@gl.TEXTURE_2D, null)
         @gl.bindTexture(@gl.TEXTURE_2D, null)
 
     bind: (number)->
@@ -41,4 +42,5 @@ Texture.fromImage = (gl, image)->
     gl.bindTexture(gl.TEXTURE_2D, texture.id)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
     gl.generateMipmap(gl.TEXTURE_2D)
+    gl.bindTexture(gl.TEXTURE_2D, null)
     return texture
