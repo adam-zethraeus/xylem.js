@@ -28,6 +28,9 @@ class ShaderProgram
         @attributes[name] = @gl.getAttribLocation(@program, name)
         @gl.enableVertexAttribArray(@attributes[name])
 
+    disableAttribute: (name)->
+        @gl.disableVertexAttribArray(getOrThrow(@attributes, name))
+
     getAttribute: (name)->
         return @attributes[name]
 

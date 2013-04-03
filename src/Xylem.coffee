@@ -87,16 +87,20 @@ class Xylem
         @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
         @initialShaderProgram.compileShader(resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
         @initialShaderProgram.enableProgram()
-        @initialShaderProgram.enableAttribute("vertexPosition")
-        @initialShaderProgram.enableAttribute("vertexNormal")
-        @initialShaderProgram.enableAttribute("vertexColor")
-        @initialShaderProgram.enableAttribute("textureCoord")
 
         callback()
     
     draw: ()->
+        @initialShaderProgram.enableAttribute("vertexPosition")
+        @initialShaderProgram.enableAttribute("vertexNormal")
+        @initialShaderProgram.enableAttribute("vertexColor")
+        @initialShaderProgram.enableAttribute("textureCoord")
         @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
         @sceneGraph.draw(@initialShaderProgram)
+        @initialShaderProgram.disableAttribute("vertexPosition")
+        @initialShaderProgram.disableAttribute("vertexNormal")
+        @initialShaderProgram.disableAttribute("vertexColor")
+        @initialShaderProgram.disableAttribute("textureCoord")
 
     mainLoop: ()->
         @draw()
