@@ -34,7 +34,7 @@ window.onload = function(){
         });
         httpRequest.open("GET", sceneUrl, false); // sync
         httpRequest.send();
-    x.loadScene(scene, function(){x.mainLoop();});
+    x.loadScene(scene, function(){x.draw();});
 }
 </script>
 </head>
