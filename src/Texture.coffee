@@ -9,6 +9,8 @@ class Texture
         @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @width, @height, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null)
         @gl.generateMipmap(@gl.TEXTURE_2D, null)
         @gl.bindTexture(@gl.TEXTURE_2D, null)
+        @framebuffer = null
+        @renderbuffer = null
 
     bind: (number)->
         @gl.activeTexture(@gl.TEXTURE0 + (number || 0))
@@ -22,16 +24,14 @@ class Texture
         if not useDepth?
             useDepth = true
         hold = @gl.getParameter(@gl.VIEWPORT)
-        framebuffer = @gl.createFramebuffer()
-        @gl.bindFramebuffer(@gl.FRAMEBUFFER, framebuffer)
+        @framebuffer = @framebuffer || @gl.createFramebuffer()
+        @gl.bindFramebuffer(@gl.FRAMEBUFFER, @framebuffer)
         @gl.framebufferTexture2D(@gl.FRAMEBUFFER, @gl.COLOR_ATTACHMENT0, @gl.TEXTURE_2D, @id, 0)
         if useDepth
-            renderbuffer = @gl.createRenderbuffer()
-            @gl.bindRenderbuffer(@gl.RENDERBUFFER, renderbuffer)
-            renderbuffer.width = @width
-            renderbuffer.height = @height
+            @renderbuffer = @renderbuffer || @gl.createRenderbuffer()
+            @gl.bindRenderbuffer(@gl.RENDERBUFFER, @renderbuffer)
             @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, @width, @height)
-            @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, renderbuffer)
+            @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, @renderbuffer)
         @gl.viewport(0, 0, @width, @height)
 
         drawCallback()
