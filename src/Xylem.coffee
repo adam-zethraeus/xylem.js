@@ -91,7 +91,7 @@ class Xylem
         callback()
     
     draw: ()->
-        t = new Texture(@gl, 512, 512)
+        t = new Texture(@gl, 1024, 1024)
         t.drawTo(
             ()=>
                 @initialShaderProgram.enableAttribute("vertexPosition")
