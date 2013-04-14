@@ -56,6 +56,6 @@ Texture.fromImage = (gl, image)->
     texture = new Texture(gl, image.width, image.height)
     gl.bindTexture(gl.TEXTURE_2D, texture.id)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-    # gl.generateMipmap(gl.TEXTURE_2D)
+    gl.generateMipmap(gl.TEXTURE_2D)
     gl.bindTexture(gl.TEXTURE_2D, null)
     return texture
