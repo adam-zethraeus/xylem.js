@@ -1,12 +1,12 @@
 class Texture
 
-    constructor: (@gl, @width, @height)->
+    constructor: (@gl, @dimensions)->
         @id = @gl.createTexture()
         @gl.bindTexture(@gl.TEXTURE_2D, @id)
         @gl.pixelStorei(@gl.UNPACK_FLIP_Y_WEBGL, true)
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR);
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR);
-        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @width, @height, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null)
+        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @dimensions[0], @dimensions[1], 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null)
         @gl.bindTexture(@gl.TEXTURE_2D, null)
         @framebuffer = null
         @renderbuffer = null
@@ -29,9 +29,9 @@ class Texture
         if useDepth
             @renderbuffer = @renderbuffer || @gl.createRenderbuffer()
             @gl.bindRenderbuffer(@gl.RENDERBUFFER, @renderbuffer)
-            @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, @width, @height)
+            @gl.renderbufferStorage(@gl.RENDERBUFFER, @gl.DEPTH_COMPONENT16, @dimensions[0], @dimensions[1])
             @gl.framebufferRenderbuffer(@gl.FRAMEBUFFER, @gl.DEPTH_ATTACHMENT, @gl.RENDERBUFFER, @renderbuffer)
-        @gl.viewport(0, 0, @width, @height)
+        @gl.viewport(0, 0, @dimensions[0], @dimensions[1])
 
         drawCallback()
 
@@ -43,15 +43,12 @@ class Texture
         hold = texture.id
         texture.id = @id
         @id = hold
-        hold = texture.width
-        texture.width = @width
-        @width = hold
-        hold = texture.height
-        texture.height = @height
-        @height = hold
+        hold = texture.dimensions
+        texture.dimensions = @dimensions
+        @dimensions = hold
 
 Texture.fromImage = (gl, image)->
-    texture = new Texture(gl, image.width, image.height)
+    texture = new Texture(gl, [image.width, image.height])
     gl.bindTexture(gl.TEXTURE_2D, texture.id)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
     gl.generateMipmap(gl.TEXTURE_2D)
