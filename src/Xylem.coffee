@@ -89,7 +89,7 @@ class Xylem
     
     draw: ()->
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
-        @screenQuad.drawWithTexture(@gBuffer.albedoTexture)
+        @screenQuad.drawWithTexture(@gBuffer.normalsAndDepthTexture)
 
     mainLoop: ()->
         @draw()
