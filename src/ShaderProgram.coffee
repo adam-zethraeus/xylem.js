@@ -12,7 +12,7 @@ class ShaderProgram
         throw "A shader would not compile." if not @gl.getShaderParameter(glShader, @gl.COMPILE_STATUS)
         @shaders.push(glShader)
 
-    enableProgram: ()->
+    linkProgram: ()->
         @program = @gl.createProgram()
         for shader in @shaders
             throw "Shader hasn't been compiled." if not @gl.getShaderParameter(shader, @gl.COMPILE_STATUS)
@@ -20,11 +20,13 @@ class ShaderProgram
         @gl.linkProgram(@program)
         if not @gl.getProgramParameter(@program, @gl.LINK_STATUS)
             throw "Shader couldn't be linked."
+
+    enableProgram: ()->
         @gl.useProgram(@program)
 
     enableAttribute: (name)->
         if !@program
-            throw "you must first enable the program."
+            throw "you must first link the program."
         @attributes[name] = @gl.getAttribLocation(@program, name)
         @gl.enableVertexAttribArray(@attributes[name])
 

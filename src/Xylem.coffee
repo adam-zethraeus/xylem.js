@@ -86,7 +86,7 @@ class Xylem
         @initialShaderProgram = new ShaderProgram(@gl)
         @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
         @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
-        @initialShaderProgram.enableProgram()
+        @initialShaderProgram.linkProgram()
 
         callback()
     
@@ -94,6 +94,7 @@ class Xylem
         t = new Texture(@gl, [1024, 1024])
         t.drawTo(
             ()=>
+                @initialShaderProgram.enableProgram()
                 @initialShaderProgram.enableAttribute("vertexPosition")
                 @initialShaderProgram.enableAttribute("vertexNormal")
                 @initialShaderProgram.enableAttribute("vertexColor")

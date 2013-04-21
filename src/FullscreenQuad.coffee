@@ -53,7 +53,7 @@ class FullscreenQuad
             }"
             @gl.VERTEX_SHADER
         )
-        @blitProgram.enableProgram()
+        @blitProgram.linkProgram()
 
     draw: (shaderProgram)->
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @vertexPositionBuffer)
@@ -64,6 +64,7 @@ class FullscreenQuad
         @gl.drawElements(@gl.TRIANGLES, @indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
 
     drawWithTexture: (texture)->
+        @blitProgram.enableProgram()
         @blitProgram.enableAttribute("vertexPosition")
         @blitProgram.enableAttribute("textureCoord")
         texture.bind(0)
