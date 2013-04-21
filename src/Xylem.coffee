@@ -4,6 +4,8 @@ class Xylem
         @gl = null
         @sceneGraph = null
         @gl = @initializeGL(canvas)
+        @gBuffer = new GBuffer(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+        @screenQuad = new FullscreenQuad(@gl)
 
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
