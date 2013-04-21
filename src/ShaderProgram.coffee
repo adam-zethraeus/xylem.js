@@ -52,21 +52,3 @@ class ShaderProgram
     
     setUniformMatrix4fv: (name, matrix)->
         @gl.uniformMatrix4fv(@gl.getUniformLocation(@program, name), false, matrix)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
