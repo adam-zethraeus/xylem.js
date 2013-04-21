@@ -22,11 +22,13 @@ class ShaderProgram
             throw "Shader couldn't be linked."
 
     enableProgram: ()->
+        if !@program
+            throw "ShaderProgram must be linked before enabling it."
         @gl.useProgram(@program)
 
     enableAttribute: (name)->
         if !@program
-            throw "you must first link the program."
+            throw "ShaderProgram must be linked before enabling attribute."
         @attributes[name] = @gl.getAttribLocation(@program, name)
         @gl.enableVertexAttribArray(@attributes[name])
 
