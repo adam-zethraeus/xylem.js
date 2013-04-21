@@ -3,41 +3,87 @@ class GBuffer
     constructor: (@gl, dimensions)->
         @normalsAndDepthTexture = new Texture(@gl, dimensions)
         @albedoTexture = new Texture(@gl, dimensions)
-        @normalsAndDepthShader = new ShaderProgram(@gl)
-        @normalsAndDepthShader.compileShader("//fragment shader text", @gl.FRAGMENT_SHADER)
-        @normalsAndDepthShader.compileShader("//vertex shader text", @gl.VERTEX_SHADER)
+        @normalsAndDepthProgram = new ShaderProgram(@gl)
+        @normalsAndDepthProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                uniform sampler2D sampler;
+                void main(void) {
+                    gl_FragColor = texture2D(sampler, vTextureCoord);
+                }
+            "
+            @gl.FRAGMENT_SHADER
+        )
+        @normalsAndDepthProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec2 textureCoord;
+                varying vec2 vTextureCoord;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                    vTextureCoord = textureCoord;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @normalsAndDepthProgram.linkProgram()
 
-        @albedoShader = new ShaderProgram(@gl)
+        @albedoProgram = new ShaderProgram(@gl)
+        @albedoProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                uniform sampler2D sampler;
+                void main(void) {
+                    gl_FragColor = texture2D(sampler, vTextureCoord);
+                }
+            "
+            @gl.FRAGMENT_SHADER
+        )
+        @albedoProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec2 textureCoord;
+                varying vec2 vTextureCoord;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                    vTextureCoord = textureCoord;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @albedoProgram.linkProgram()
 
     populate: (drawWithShader)->
-        @normalsAndDepthShader.enableProgram()
-        @normalsAndDepthShader.enableAttribute("vertexPosition")
-        @normalsAndDepthShader.enableAttribute("vertexNormal")
-        @normalsAndDepthShader.enableAttribute("vertexColor")
-        @normalsAndDepthShader.enableAttribute("textureCoord")
+        @normalsAndDepthProgram.enableProgram()
+        @normalsAndDepthProgram.enableAttribute("vertexPosition")
+        @normalsAndDepthProgram.enableAttribute("vertexNormal")
+        @normalsAndDepthProgram.enableAttribute("vertexColor")
+        @normalsAndDepthProgram.enableAttribute("textureCoord")
         @normalsAndDepthTexture.drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                drawWithShader(@normalsAndDepthShader)
+                drawWithShader(@normalsAndDepthProgram)
             true
         )
-        @normalsAndDepthShader.disableAttribute("vertexPosition")
-        @normalsAndDepthShader.disableAttribute("vertexNormal")
-        @normalsAndDepthShader.disableAttribute("vertexColor")
-        @normalsAndDepthShader.disableAttribute("textureCoord")
+        @normalsAndDepthProgram.disableAttribute("vertexPosition")
+        @normalsAndDepthProgram.disableAttribute("vertexNormal")
+        @normalsAndDepthProgram.disableAttribute("vertexColor")
+        @normalsAndDepthProgram.disableAttribute("textureCoord")
 
-        @albedoShader.enableProgram()
-        @albedoShader.enableAttribute("vertexPosition")
-        @albedoShader.enableAttribute("vertexNormal")
-        @albedoShader.enableAttribute("vertexColor")
-        @albedoShader.enableAttribute("textureCoord")
+        @albedoProgram.enableProgram()
+        @albedoProgram.enableAttribute("vertexPosition")
+        @albedoProgram.enableAttribute("vertexNormal")
+        @albedoProgram.enableAttribute("vertexColor")
+        @albedoProgram.enableAttribute("textureCoord")
         @albedoTexture.drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                drawWithShader(@albedoShader)
+                drawWithShader(@albedoProgram)
             true
         )
-        @albedoShader.disableAttribute("vertexPosition")
-        @albedoShader.disableAttribute("vertexNormal")
-        @albedoShader.disableAttribute("vertexColor")
-        @albedoShader.disableAttribute("textureCoord")
+        @albedoProgram.disableAttribute("vertexPosition")
+        @albedoProgram.disableAttribute("vertexNormal")
+        @albedoProgram.disableAttribute("vertexColor")
+        @albedoProgram.disableAttribute("textureCoord")
