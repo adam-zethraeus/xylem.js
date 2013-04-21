@@ -83,32 +83,10 @@ class Xylem
         for obj in objs
             objTraverse(@sceneGraph.getRoot(), obj)
 
-        @initialShaderProgram = new ShaderProgram(@gl)
-        @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
-        @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
-        @initialShaderProgram.linkProgram()
-
         callback()
     
     draw: ()->
-        t = new Texture(@gl, [1024, 1024])
-        t.drawTo(
-            ()=>
-                @initialShaderProgram.enableProgram()
-                @initialShaderProgram.enableAttribute("vertexPosition")
-                @initialShaderProgram.enableAttribute("vertexNormal")
-                @initialShaderProgram.enableAttribute("vertexColor")
-                @initialShaderProgram.enableAttribute("textureCoord")
-                @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                @sceneGraph.draw(@initialShaderProgram)
-                @initialShaderProgram.disableAttribute("vertexPosition")
-                @initialShaderProgram.disableAttribute("vertexNormal")
-                @initialShaderProgram.disableAttribute("vertexColor")
-                @initialShaderProgram.disableAttribute("textureCoord")
-            true
-        )
-        f = new FullscreenQuad(@gl)
-        f.drawWithTexture(t)
+
 
     mainLoop: ()->
         @draw()
