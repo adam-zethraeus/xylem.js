@@ -9,7 +9,7 @@ class GBuffer
 
         @albedoShader = new ShaderProgram(@gl)
 
-    populate: (drawable)->
+    populate: (drawWithShader)->
         @normalsAndDepthShader.enableProgram()
         @normalsAndDepthShader.enableAttribute("vertexPosition")
         @normalsAndDepthShader.enableAttribute("vertexNormal")
@@ -18,7 +18,7 @@ class GBuffer
         @normalsAndDepthTexture.drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                drawable.draw(@normalsAndDepthShader)
+                drawWithShader(@normalsAndDepthShader)
             true
         )
         @normalsAndDepthShader.disableAttribute("vertexPosition")
@@ -34,7 +34,7 @@ class GBuffer
         @albedoTexture.drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                drawable.draw(@albedoShader)
+                drawWithShader(@albedoShader)
             true
         )
         @albedoShader.disableAttribute("vertexPosition")
