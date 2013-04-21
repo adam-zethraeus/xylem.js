@@ -33,6 +33,28 @@ class FullscreenQuad
         @indexBuffer.itemSize = 1
         @indexBuffer.numItems = indices.length
 
+        @blitProgram = new ShaderProgram(@gl)
+        @blitProgram.compileShader(
+            "precision mediump float;
+            varying vec2 vTextureCoord;
+            uniform sampler2D sampler;
+            void main(void) {
+                gl_FragColor = texture2D(sampler, vTextureCoord);
+            }"
+            @gl.FRAGMENT_SHADER
+        )
+        @blitProgram.compileShader(
+            "attribute vec3 vertexPosition;
+            attribute vec2 textureCoord;
+            varying vec2 vTextureCoord;
+            void main(void) {
+                gl_Position = vec4(vertexPosition, 1.0);
+                vTextureCoord = textureCoord;
+            }"
+            @gl.VERTEX_SHADER
+        )
+        @blitProgram.enableProgram()
+
     draw: (shaderProgram)->
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @vertexPositionBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexPosition"), @vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
@@ -40,3 +62,12 @@ class FullscreenQuad
         @gl.vertexAttribPointer(shaderProgram.getAttribute("textureCoord"), @vertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
         @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @indexBuffer)
         @gl.drawElements(@gl.TRIANGLES, @indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
+
+    drawWithTexture: (texture)->
+        @blitProgram.enableAttribute("vertexPosition")
+        @blitProgram.enableAttribute("textureCoord")
+        texture.bind(0)
+        @blitProgram.setUniform1i("sampler", 0)
+        @draw(@blitProgram)
+        @blitProgram.disableAttribute("vertexPosition")
+        @blitProgram.disableAttribute("textureCoord")

@@ -107,17 +107,7 @@ class Xylem
             true
         )
         f = new FullscreenQuad(@gl)
-        s = new ShaderProgram(@gl)
-        s.compileShader(@resourceMap["blit_frag"], @gl.FRAGMENT_SHADER)
-        s.compileShader(@resourceMap["blit_vert"], @gl.VERTEX_SHADER)
-        s.enableProgram()
-        s.enableAttribute("vertexPosition")
-        s.enableAttribute("textureCoord")
-        t.bind(0)
-        s.setUniform1i("sampler", 0)
-        f.draw(s)
-        s.disableAttribute("vertexPosition")
-        s.disableAttribute("textureCoord")
+        f.drawWithTexture(t)
 
     mainLoop: ()->
         @draw()
