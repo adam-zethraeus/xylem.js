@@ -5,6 +5,9 @@ class Xylem
         @sceneGraph = null
         @gl = @initializeGL(canvas)
         @gBuffer = new GBuffer(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+        @buffers = [new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+                    new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
+        @currBuffer = 0
         @screenQuad = new FullscreenQuad(@gl)
 
     initializeGL: (canvas)->
@@ -88,8 +91,21 @@ class Xylem
         callback()
     
     draw: ()->
+        #consider drawing to same layer w/ additive blend mode?
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
-        @screenQuad.drawWithTexture(@gBuffer.normalsAndDepthTexture)
+        @gBuffer.normalsTexture.bind(0)
+        @gBuffer.albedoTexture.bind(1)
+        @gBuffer.positionTexture.bind(3)
+        lights = @sceneGraph.getNodesOfType(SceneLight)
+        for light in lights
+            #@buffers[@currBuffer].bind(2)
+            #@currBuffer ^= 1
+            @buffers[@currBuffer].drawTo(
+                ()=>
+                    @gl.clear(@gl.COLOR_BUFFER_BIT)
+                false
+            )
+
 
     mainLoop: ()->
         @draw()

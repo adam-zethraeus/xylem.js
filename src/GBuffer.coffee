@@ -1,10 +1,11 @@
 class GBuffer
 
     constructor: (@gl, dimensions)->
-        @normalsAndDepthTexture = new Texture(@gl, dimensions)
+        @normalsTexture = new Texture(@gl, dimensions)
         @albedoTexture = new Texture(@gl, dimensions)
-        @normalsAndDepthProgram = new ShaderProgram(@gl)
-        @normalsAndDepthProgram.compileShader(
+        @positionTexture = new Texture(@gl, dimensions)
+        @normalsProgram = new ShaderProgram(@gl)
+        @normalsProgram.compileShader(
             "
                 precision mediump float;
                 varying vec2 vTextureCoord;
@@ -14,12 +15,12 @@ class GBuffer
                 uniform float textureOpacity;
                 uniform sampler2D sampler;
                 void main(void) {
-                    gl_FragColor = vec4(normalize(vTransformedNormal), vPosition.z);
+                    gl_FragColor = vec4(normalize(vTransformedNormal), 1.0);
                 }
             "
             @gl.FRAGMENT_SHADER
         )
-        @normalsAndDepthProgram.compileShader(
+        @normalsProgram.compileShader(
             "
                 attribute vec3 vertexPosition;
                 attribute vec3 vertexNormal;
@@ -42,7 +43,7 @@ class GBuffer
             "
             @gl.VERTEX_SHADER
         )
-        @normalsAndDepthProgram.linkProgram()
+        @normalsProgram.linkProgram()
 
         @albedoProgram = new ShaderProgram(@gl)
         @albedoProgram.compileShader(
@@ -85,22 +86,63 @@ class GBuffer
         )
         @albedoProgram.linkProgram()
 
+        @positionProgram = new ShaderProgram(@gl)
+        @positionProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                varying vec3 vTransformedNormal;
+                varying vec3 vColor;
+                varying vec4 vPosition;
+                uniform float textureOpacity;
+                uniform sampler2D sampler;
+                void main(void) {
+                    gl_FragColor = vPosition;
+                }
+            "
+            @gl.FRAGMENT_SHADER
+        )
+        @positionProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec3 vertexNormal;
+                attribute vec3 vertexColor;
+                attribute vec2 textureCoord;
+                uniform mat4 mvMatrix;
+                uniform mat4 pMatrix;
+                uniform mat3 nMatrix;
+                varying vec2 vTextureCoord;
+                varying vec3 vTransformedNormal;
+                varying vec3 vColor;
+                varying vec4 vPosition;
+                void main(void) {
+                    vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+                    gl_Position = pMatrix * vPosition;
+                    vTextureCoord = textureCoord;
+                    vColor = vertexColor;
+                    vTransformedNormal = nMatrix * vertexNormal;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @positionProgram.linkProgram()
+
     populate: (drawWithShader)->
-        @normalsAndDepthProgram.enableProgram()
-        @normalsAndDepthProgram.enableAttribute("vertexPosition")
-        @normalsAndDepthProgram.enableAttribute("vertexNormal")
-        @normalsAndDepthProgram.enableAttribute("vertexColor")
-        @normalsAndDepthProgram.enableAttribute("textureCoord")
-        @normalsAndDepthTexture.drawTo(
+        @normalsProgram.enableProgram()
+        @normalsProgram.enableAttribute("vertexPosition")
+        @normalsProgram.enableAttribute("vertexNormal")
+        @normalsProgram.enableAttribute("vertexColor")
+        @normalsProgram.enableAttribute("textureCoord")
+        @normalsTexture.drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                drawWithShader(@normalsAndDepthProgram)
+                drawWithShader(@normalsProgram)
             true
         )
-        @normalsAndDepthProgram.disableAttribute("vertexPosition")
-        @normalsAndDepthProgram.disableAttribute("vertexNormal")
-        @normalsAndDepthProgram.disableAttribute("vertexColor")
-        @normalsAndDepthProgram.disableAttribute("textureCoord")
+        @normalsProgram.disableAttribute("vertexPosition")
+        @normalsProgram.disableAttribute("vertexNormal")
+        @normalsProgram.disableAttribute("vertexColor")
+        @normalsProgram.disableAttribute("textureCoord")
 
         @albedoProgram.enableProgram()
         @albedoProgram.enableAttribute("vertexPosition")
@@ -117,3 +159,19 @@ class GBuffer
         @albedoProgram.disableAttribute("vertexNormal")
         @albedoProgram.disableAttribute("vertexColor")
         @albedoProgram.disableAttribute("textureCoord")
+
+        @positionProgram.enableProgram()
+        @positionProgram.enableAttribute("vertexPosition")
+        @positionProgram.enableAttribute("vertexNormal")
+        @positionProgram.enableAttribute("vertexColor")
+        @positionProgram.enableAttribute("textureCoord")
+        @positionTexture.drawTo(
+            ()=>
+                @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
+                drawWithShader(@positionProgram)
+            true
+        )
+        @positionProgram.disableAttribute("vertexPosition")
+        @positionProgram.disableAttribute("vertexNormal")
+        @positionProgram.disableAttribute("vertexColor")
+        @positionProgram.disableAttribute("textureCoord")
