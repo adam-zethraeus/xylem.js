@@ -13,10 +13,7 @@ class GBuffer
                 varying vec4 vPosition;
                 uniform float textureOpacity;
                 uniform sampler2D sampler;
-
-
                 void main(void) {
-                    vec4 fragmentColor = vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
                     gl_FragColor = vec4(normalize(vTransformedNormal), vPosition.z);
                 }
             "
@@ -28,17 +25,13 @@ class GBuffer
                 attribute vec3 vertexNormal;
                 attribute vec3 vertexColor;
                 attribute vec2 textureCoord;
-
                 uniform mat4 mvMatrix;
                 uniform mat4 pMatrix;
                 uniform mat3 nMatrix;
-
                 varying vec2 vTextureCoord;
                 varying vec3 vTransformedNormal;
                 varying vec3 vColor;
                 varying vec4 vPosition;
-
-
                 void main(void) {
                     vPosition = mvMatrix * vec4(vertexPosition, 1.0);
                     gl_Position = pMatrix * vPosition;
@@ -61,11 +54,8 @@ class GBuffer
                 varying vec4 vPosition;
                 uniform float textureOpacity;
                 uniform sampler2D sampler;
-
-
                 void main(void) {
-                    vec4 fragmentColor = vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
-                    gl_FragColor = vec4(fragmentColor.rgb, fragmentColor.a);
+                    gl_FragColor =  vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
                 }
             "
             @gl.FRAGMENT_SHADER
@@ -76,17 +66,13 @@ class GBuffer
                 attribute vec3 vertexNormal;
                 attribute vec3 vertexColor;
                 attribute vec2 textureCoord;
-
                 uniform mat4 mvMatrix;
                 uniform mat4 pMatrix;
                 uniform mat3 nMatrix;
-
                 varying vec2 vTextureCoord;
                 varying vec3 vTransformedNormal;
                 varying vec3 vColor;
                 varying vec4 vPosition;
-
-
                 void main(void) {
                     vPosition = mvMatrix * vec4(vertexPosition, 1.0);
                     gl_Position = pMatrix * vPosition;
