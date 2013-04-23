@@ -103,12 +103,26 @@ class Xylem
                 precision mediump float;
                 varying vec2 vTextureCoord;
                 uniform sampler2D normals;
-                uniform sampler2D albedo;
-                uniform sampler2D position;
+                uniform sampler2D albedos;
+                uniform sampler2D positions;
+                uniform vec3 ambientColor;
+                uniform vec3 pointLightingLocation;
+                uniform vec3 pointLightingSpecularColor;
+                uniform vec3 pointLightingDiffuseColor;
                 void main(void) {
                     vec4 normal = texture2D(normals, vTextureCoord);
-                    vec4 albedo = texture2D(albedo, vTextureCoord);
-                    vec4 position = texture2D(position, vTextureCoord);
+                    vec4 albedo = texture2D(albedos, vTextureCoord);
+                    vec4 position = texture2D(positions, vTextureCoord);
+                    vec3 lightDirection = normalize(pointLightingLocation - position.xyz);
+                    vec3 eyeDirection = normalize(-position.xyz);
+                    vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
+                    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 32.0);
+
+                    float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
+                    vec3 lightWeighting = ambientColor
+                        + pointLightingSpecularColor * specularLightWeighting
+                        + pointLightingDiffuseColor * diffuseLightWeighting;
+
                     gl_FragColor = (normal + albedo + normalize(position))/2.0;
                 }
             "
@@ -131,8 +145,8 @@ class Xylem
         @combineProgram.enableAttribute("vertexPosition")
         @combineProgram.enableAttribute("textureCoord")
         @combineProgram.setUniform1i("normals", 0)
-        @combineProgram.setUniform1i("albedo", 1)
-        @combineProgram.setUniform1i("position", 2)
+        @combineProgram.setUniform1i("albedos", 1)
+        @combineProgram.setUniform1i("positions", 2)
         @buffers[@currBuffer].drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT)
