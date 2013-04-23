@@ -95,16 +95,55 @@ class Xylem
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
         @gBuffer.normalsTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
-        @gBuffer.positionTexture.bind(3)
-        lights = @sceneGraph.getNodesOfType(SceneLight)
-        for light in lights
-            #@buffers[@currBuffer].bind(2)
-            #@currBuffer ^= 1
-            @buffers[@currBuffer].drawTo(
-                ()=>
-                    @gl.clear(@gl.COLOR_BUFFER_BIT)
-                false
-            )
+        @gBuffer.positionTexture.bind(2)
+        light = @sceneGraph.getNodesOfType(SceneLight)[0]
+        @combineProgram = new ShaderProgram(@gl)
+        @combineProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                uniform sampler2D normals;
+                uniform sampler2D albedo;
+                uniform sampler2D position;
+                void main(void) {
+                    vec4 normal = texture2D(normals, vTextureCoord);
+                    vec4 albedo = texture2D(albedo, vTextureCoord);
+                    vec4 position = texture2D(position, vTextureCoord);
+                    gl_FragColor = (normal + albedo + normalize(position))/2.0;
+                }
+            "
+            @gl.FRAGMENT_SHADER
+        )
+        @combineProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec2 textureCoord;
+                varying vec2 vTextureCoord;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                    vTextureCoord = textureCoord;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @combineProgram.linkProgram()
+        @combineProgram.enableProgram()
+        @combineProgram.enableAttribute("vertexPosition")
+        @combineProgram.enableAttribute("textureCoord")
+        @combineProgram.setUniform1i("normals", 0)
+        @combineProgram.setUniform1i("albedo", 1)
+        @combineProgram.setUniform1i("position", 2)
+        @buffers[@currBuffer].drawTo(
+            ()=>
+                @gl.clear(@gl.COLOR_BUFFER_BIT)
+                @screenQuad.draw(@combineProgram)
+            false
+        )
+        @combineProgram.disableAttribute("vertexPosition")
+        @combineProgram.disableAttribute("textureCoord")
+
+
+        @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
 
     mainLoop: ()->
