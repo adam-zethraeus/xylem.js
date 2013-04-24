@@ -109,6 +109,7 @@ class Xylem
                 uniform vec3 pointLightingLocation;
                 uniform vec3 pointLightingSpecularColor;
                 uniform vec3 pointLightingDiffuseColor;
+                uniform float specularHardness;
                 void main(void) {
                     vec4 normal = texture2D(normals, vTextureCoord);
                     vec4 albedo = texture2D(albedos, vTextureCoord);
@@ -116,14 +117,13 @@ class Xylem
                     vec3 lightDirection = normalize(pointLightingLocation - position.xyz);
                     vec3 eyeDirection = normalize(-position.xyz);
                     vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
-                    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 32.0);
-
+                    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
                     float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
                     vec3 lightWeighting = ambientColor
                         + pointLightingSpecularColor * specularLightWeighting
                         + pointLightingDiffuseColor * diffuseLightWeighting;
 
-                    gl_FragColor = (normal + albedo + normalize(position))/2.0;
+                    gl_FragColor = vec4(albedo.rgb * lightWeighting, albedo.a);
                 }
             "
             @gl.FRAGMENT_SHADER
@@ -142,6 +142,7 @@ class Xylem
         )
         @combineProgram.linkProgram()
         @combineProgram.enableProgram()
+        light.setUniforms(@combineProgram, [0,3,0])
         @combineProgram.enableAttribute("vertexPosition")
         @combineProgram.enableAttribute("textureCoord")
         @combineProgram.setUniform1i("normals", 0)
