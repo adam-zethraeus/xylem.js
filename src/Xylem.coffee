@@ -20,6 +20,7 @@ class Xylem
         gl.disable(gl.BLEND)
         gl.enable(gl.DEPTH_TEST)
         gl.depthFunc(gl.LEQUAL)
+        gl.getExtension('OES_texture_float')
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         if not gl
             throw "Could not initialize WebGL."
@@ -142,7 +143,7 @@ class Xylem
         )
         @combineProgram.linkProgram()
         @combineProgram.enableProgram()
-        light.setUniforms(@combineProgram, [0,3,0])
+        light.setUniforms(@combineProgram, [0,3,3])
         @combineProgram.enableAttribute("vertexPosition")
         @combineProgram.enableAttribute("textureCoord")
         @combineProgram.setUniform1i("normals", 0)

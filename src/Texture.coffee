@@ -6,7 +6,7 @@ class Texture
         @gl.pixelStorei(@gl.UNPACK_FLIP_Y_WEBGL, true)
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR);
         @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR);
-        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @dimensions[0], @dimensions[1], 0, @gl.RGBA, @gl.UNSIGNED_BYTE, null)
+        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @dimensions[0], @dimensions[1], 0, @gl.RGBA, @gl.FLOAT, null)
         @gl.bindTexture(@gl.TEXTURE_2D, null)
         @framebuffer = null
         @renderbuffer = null
@@ -50,7 +50,7 @@ class Texture
 Texture.fromImage = (gl, image)->
     texture = new Texture(gl, [image.width, image.height])
     gl.bindTexture(gl.TEXTURE_2D, texture.id)
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.FLOAT, image)
     gl.generateMipmap(gl.TEXTURE_2D)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST)
     gl.bindTexture(gl.TEXTURE_2D, null)
