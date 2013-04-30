@@ -76,3 +76,4 @@ class FullscreenQuad
         @draw(@blitProgram)
         @blitProgram.disableAttribute("vertexPosition")
         @blitProgram.disableAttribute("textureCoord")
+

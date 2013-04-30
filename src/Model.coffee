@@ -79,11 +79,3 @@ class Model
         @gl.drawElements(@gl.TRIANGLES, @buffers.indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
         if @textureOpacity > 0
             texture.unbind(bindLocation)
-
-
-
-
-
-
-
-
