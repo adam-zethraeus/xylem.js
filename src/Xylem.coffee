@@ -11,7 +11,8 @@ class Xylem
         @screenQuad = new FullscreenQuad(@gl)
 
     initializeGL: (canvas)->
-        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+        gl = canvas.getContext("webgl") or canvas.getContext("experimental-webgl")
+        gl or throw "Could not initialize WebGL."
         gl.viewportWidth = canvas.width
         gl.viewportHeight = canvas.height
         gl.enable(gl.CULL_FACE)
@@ -20,12 +21,9 @@ class Xylem
         gl.disable(gl.BLEND)
         gl.enable(gl.DEPTH_TEST)
         gl.depthFunc(gl.LEQUAL)
-        gl.getExtension('OES_texture_float')
+        gl.getExtension('OES_texture_float') or throw "No floating point texture support."
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
-        if not gl
-            throw "Could not initialize WebGL."
-        else
-            return gl
+        return gl
 
     loadScene: (scene, callback)->
         @loadSceneResources(
@@ -97,7 +95,6 @@ class Xylem
         @gBuffer.normalsTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
         @gBuffer.positionTexture.bind(2)
-        light = @sceneGraph.getNodesOfType(SceneLight)[0]
         @combineProgram = new ShaderProgram(@gl)
         @combineProgram.compileShader(
             "
@@ -143,7 +140,14 @@ class Xylem
         )
         @combineProgram.linkProgram()
         @combineProgram.enableProgram()
-        light.setUniforms(@combineProgram, [0,3,3])
+        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
+        light = @sceneGraph.getNodesOfType(SceneLight)[0]
+        origin = vec4.fromValues(0, 0, 0, 1)
+        pos = vec4.create()
+        lightMVMatrix = mat4.create()
+        mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
+        vec4.transformMat4(pos, origin, lightMVMatrix)
+        light.setUniforms(@combineProgram, [pos[0], pos[1], pos[2]])
         @combineProgram.enableAttribute("vertexPosition")
         @combineProgram.enableAttribute("textureCoord")
         @combineProgram.setUniform1i("normals", 0)
