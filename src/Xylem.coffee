@@ -4,9 +4,15 @@ class Xylem
         @gl = null
         @sceneGraph = null
         @gl = @initializeGL(canvas)
+        @gBuffer = new GBuffer(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+        @buffers = [new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+                    new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
+        @currBuffer = 0
+        @screenQuad = new FullscreenQuad(@gl)
 
     initializeGL: (canvas)->
-        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+        gl = canvas.getContext("webgl") or canvas.getContext("experimental-webgl")
+        gl or throw "Could not initialize WebGL."
         gl.viewportWidth = canvas.width
         gl.viewportHeight = canvas.height
         gl.enable(gl.CULL_FACE)
@@ -15,11 +21,9 @@ class Xylem
         gl.disable(gl.BLEND)
         gl.enable(gl.DEPTH_TEST)
         gl.depthFunc(gl.LEQUAL)
+        gl.getExtension('OES_texture_float') or throw "No floating point texture support."
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
-        if not gl
-            throw "Could not initialize WebGL."
-        else
-            return gl
+        return gl
 
     loadScene: (scene, callback)->
         @loadSceneResources(
@@ -83,32 +87,84 @@ class Xylem
         for obj in objs
             objTraverse(@sceneGraph.getRoot(), obj)
 
-        @initialShaderProgram = new ShaderProgram(@gl)
-        @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "fragment")], @gl.FRAGMENT_SHADER)
-        @initialShaderProgram.compileShader(@resourceMap[getOrThrow(scene.shaders, "vertex")], @gl.VERTEX_SHADER)
-        @initialShaderProgram.linkProgram()
-
         callback()
     
     draw: ()->
-        t = new Texture(@gl, [1024, 1024])
-        t.drawTo(
-            ()=>
-                @initialShaderProgram.enableProgram()
-                @initialShaderProgram.enableAttribute("vertexPosition")
-                @initialShaderProgram.enableAttribute("vertexNormal")
-                @initialShaderProgram.enableAttribute("vertexColor")
-                @initialShaderProgram.enableAttribute("textureCoord")
-                @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                @sceneGraph.draw(@initialShaderProgram)
-                @initialShaderProgram.disableAttribute("vertexPosition")
-                @initialShaderProgram.disableAttribute("vertexNormal")
-                @initialShaderProgram.disableAttribute("vertexColor")
-                @initialShaderProgram.disableAttribute("textureCoord")
-            true
+        #consider drawing to same layer w/ additive blend mode?
+        @gBuffer.populate((x)=>@sceneGraph.draw(x))
+        @gBuffer.normalsTexture.bind(0)
+        @gBuffer.albedoTexture.bind(1)
+        @gBuffer.positionTexture.bind(2)
+        @combineProgram = new ShaderProgram(@gl)
+        @combineProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                uniform sampler2D normals;
+                uniform sampler2D albedos;
+                uniform sampler2D positions;
+                uniform vec3 ambientColor;
+                uniform vec3 pointLightingLocation;
+                uniform vec3 pointLightingSpecularColor;
+                uniform vec3 pointLightingDiffuseColor;
+                uniform float specularHardness;
+                void main(void) {
+                    vec4 normal = texture2D(normals, vTextureCoord);
+                    vec4 albedo = texture2D(albedos, vTextureCoord);
+                    vec4 position = texture2D(positions, vTextureCoord);
+                    vec3 lightDirection = normalize(pointLightingLocation - position.xyz);
+                    vec3 eyeDirection = normalize(-position.xyz);
+                    vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
+                    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
+                    float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
+                    vec3 lightWeighting = ambientColor
+                        + pointLightingSpecularColor * specularLightWeighting
+                        + pointLightingDiffuseColor * diffuseLightWeighting;
+
+                    gl_FragColor = vec4(albedo.rgb * lightWeighting, albedo.a);
+                }
+            "
+            @gl.FRAGMENT_SHADER
         )
-        f = new FullscreenQuad(@gl)
-        f.drawWithTexture(t)
+        @combineProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec2 textureCoord;
+                varying vec2 vTextureCoord;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                    vTextureCoord = textureCoord;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @combineProgram.linkProgram()
+        @combineProgram.enableProgram()
+        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
+        light = @sceneGraph.getNodesOfType(SceneLight)[0]
+        origin = vec4.fromValues(0, 0, 0, 1)
+        pos = vec4.create()
+        lightMVMatrix = mat4.create()
+        mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
+        vec4.transformMat4(pos, origin, lightMVMatrix)
+        light.setUniforms(@combineProgram, [pos[0], pos[1], pos[2]])
+        @combineProgram.enableAttribute("vertexPosition")
+        @combineProgram.enableAttribute("textureCoord")
+        @combineProgram.setUniform1i("normals", 0)
+        @combineProgram.setUniform1i("albedos", 1)
+        @combineProgram.setUniform1i("positions", 2)
+        @buffers[@currBuffer].drawTo(
+            ()=>
+                @gl.clear(@gl.COLOR_BUFFER_BIT)
+                @screenQuad.draw(@combineProgram)
+            false
+        )
+        @combineProgram.disableAttribute("vertexPosition")
+        @combineProgram.disableAttribute("textureCoord")
+
+
+        @screenQuad.drawWithTexture(@buffers[@currBuffer])
+
 
     mainLoop: ()->
         @draw()

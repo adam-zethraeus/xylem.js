@@ -14,6 +14,7 @@ appFiles  = [
     'SceneCamera'
     'GetOrThrow'
     'FullscreenQuad'
+    'GBuffer'
 ]
 
 task 'build', 'Build single application file from source files', ->

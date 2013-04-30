@@ -5,14 +5,6 @@
             "url" : "textures/metal.jpg",
             "type" : "image"
         }, {
-            "name" : "frag_shader",
-            "url" : "shaders/blinn_phong.frag.glsl",
-            "type" : "text"
-        }, {
-            "name" : "vert_shader",
-            "url" : "shaders/blinn_phong.vert.glsl",
-            "type" : "text"
-        }, {
             "name" : "teapot_model",
             "url" : "models/teapot.model.json",
             "type" : "json"
@@ -26,10 +18,6 @@
             "type" : "json"
         }
     ],
-    "shaders" : {
-        "fragment" : "frag_shader",
-        "vertex" : "vert_shader"
-    },
     "tree" : [
         {
             "name" : "camera_1",
