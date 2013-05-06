@@ -92,11 +92,54 @@ class Xylem
     draw: ()->
         #consider drawing to same layer w/ additive blend mode?
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
+        @gBuffer.albedoTexture.bind(0)
+        @albedoProgram = new ShaderProgram(@gl)
+        @albedoProgram.compileShader(
+            "
+                precision mediump float;
+                varying vec2 vTextureCoord;
+                uniform sampler2D albedos;
+                uniform vec3 ambientColor;
+                void main(void) {
+                    vec4 albedo = texture2D(albedos, vTextureCoord);
+                    gl_FragColor = vec4(albedo.rgb * ambientColor, albedo.a);
+                }
+            "
+            @gl.FRAGMENT_SHADER
+        )
+        @albedoProgram.compileShader(
+            "
+                attribute vec3 vertexPosition;
+                attribute vec2 textureCoord;
+                varying vec2 vTextureCoord;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                    vTextureCoord = textureCoord;
+                }
+            "
+            @gl.VERTEX_SHADER
+        )
+        @albedoProgram.linkProgram()
+        @albedoProgram.enableProgram()
+        @albedoProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
+        @albedoProgram.enableAttribute("vertexPosition")
+        @albedoProgram.enableAttribute("textureCoord")
+        @albedoProgram.setUniform1i("albedos", 0)
+        @buffers[@currBuffer].drawTo(
+            ()=>
+                @gl.clear(@gl.COLOR_BUFFER_BIT)
+                @screenQuad.draw(@albedoProgram)
+            false
+        )
+        @albedoProgram.disableAttribute("vertexPosition")
+        @albedoProgram.disableAttribute("textureCoord")
+
+
         @gBuffer.normalsTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
         @gBuffer.positionTexture.bind(2)
-        @combineProgram = new ShaderProgram(@gl)
-        @combineProgram.compileShader(
+        @lightingProgram = new ShaderProgram(@gl)
+        @lightingProgram.compileShader(
             "
                 precision mediump float;
                 varying vec2 vTextureCoord;
@@ -117,8 +160,7 @@ class Xylem
                     vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
                     float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
                     float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
-                    vec3 lightWeighting = ambientColor
-                        + pointLightingSpecularColor * specularLightWeighting
+                    vec3 lightWeighting = pointLightingSpecularColor * specularLightWeighting
                         + pointLightingDiffuseColor * diffuseLightWeighting;
 
                     gl_FragColor = vec4(albedo.rgb * lightWeighting, albedo.a);
@@ -126,7 +168,7 @@ class Xylem
             "
             @gl.FRAGMENT_SHADER
         )
-        @combineProgram.compileShader(
+        @lightingProgram.compileShader(
             "
                 attribute vec3 vertexPosition;
                 attribute vec2 textureCoord;
@@ -138,30 +180,34 @@ class Xylem
             "
             @gl.VERTEX_SHADER
         )
-        @combineProgram.linkProgram()
-        @combineProgram.enableProgram()
+        @lightingProgram.linkProgram()
+        @lightingProgram.enableProgram()
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
-        light = @sceneGraph.getNodesOfType(SceneLight)[0]
+        lights = @sceneGraph.getNodesOfType(SceneLight)
         origin = vec4.fromValues(0, 0, 0, 1)
-        pos = vec4.create()
-        lightMVMatrix = mat4.create()
-        mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
-        vec4.transformMat4(pos, origin, lightMVMatrix)
-        light.setUniforms(@combineProgram, [pos[0], pos[1], pos[2]])
-        @combineProgram.enableAttribute("vertexPosition")
-        @combineProgram.enableAttribute("textureCoord")
-        @combineProgram.setUniform1i("normals", 0)
-        @combineProgram.setUniform1i("albedos", 1)
-        @combineProgram.setUniform1i("positions", 2)
-        @buffers[@currBuffer].drawTo(
-            ()=>
-                @gl.clear(@gl.COLOR_BUFFER_BIT)
-                @screenQuad.draw(@combineProgram)
-            false
-        )
-        @combineProgram.disableAttribute("vertexPosition")
-        @combineProgram.disableAttribute("textureCoord")
-
+        @lightingProgram.enableAttribute("vertexPosition")
+        @lightingProgram.enableAttribute("textureCoord")
+        @lightingProgram.setUniform1i("normals", 0)
+        @lightingProgram.setUniform1i("albedos", 1)
+        @lightingProgram.setUniform1i("positions", 2)
+        @gl.enable(@gl.BLEND)
+        @gl.disable(@gl.DEPTH_TEST)
+        @gl.blendFunc(@gl.ONE, @gl.ONE)
+        for light in lights
+            pos = vec4.create()
+            lightMVMatrix = mat4.create()
+            mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
+            vec4.transformMat4(pos, origin, lightMVMatrix)
+            light.setUniforms(@lightingProgram, [pos[0], pos[1], pos[2]])
+            @buffers[@currBuffer].drawTo(
+                ()=>
+                    @screenQuad.draw(@lightingProgram)
+                false
+            )
+        @gl.enable(@gl.DEPTH_TEST)
+        @gl.disable(@gl.BLEND)
+        @lightingProgram.disableAttribute("vertexPosition")
+        @lightingProgram.disableAttribute("textureCoord")
 
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 

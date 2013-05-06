@@ -46,6 +46,16 @@
                     "specularHardness" : 32
                 },
                 {
+                    "name" : "light_2",
+                    "type" : "light",
+                    "lightType" : "point",
+                    "translate" : [0.4, -0.2, 0.4],
+                    "ambientColor" : [0.2, 0.2, 0.2],
+                    "diffuseColor" : [0.3, 0.8, 0.8],
+                    "specularColor" : [0.8, 0.8, 0.8],
+                    "specularHardness" : 32
+                },
+                {
                     "name" : "cuboid_1",
                     "type" : "object",
                     "translate" : [2, -1.2, -1.5],
