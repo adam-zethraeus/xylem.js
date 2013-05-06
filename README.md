@@ -1,8 +1,11 @@
 # Xylem
 
-(Finally) A browser based deferred renderer<sup>\*</sup>.
+A browser based deferred renderer.
 
-![cornell box with teapot](notes/ss_2012-02-22.png)
+![cornell box with teapot](notes/ss_2012-05-06.png)
 
-<sup>\*</sup> That currently does three geometry passes and renders only one light. (As long as WebGL implementations lack support for the [multiple render targets extension](http://www.khronos.org/registry/webgl/extensions/WEBGL_draw_buffers/), more than one geometry pass will be required).
+Status: Functional deferred rendering supporting multiple point lights.
 
+Near term to do:
+  * decrease number of geometry passes to two and minimize gbuffer.
+  * clean up.
