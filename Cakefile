@@ -3,6 +3,7 @@ fs = require 'fs'
 
 appFiles  = [
     'Xylem'
+    'Shaders'
     'Model'
     'Texture'
     'ShaderProgram'

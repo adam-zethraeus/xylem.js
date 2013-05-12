@@ -5,126 +5,18 @@ class GBuffer
         @albedoTexture = new Texture(@gl, dimensions)
         @positionTexture = new Texture(@gl, dimensions)
         @normalsProgram = new ShaderProgram(@gl)
-        @normalsProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                uniform float textureOpacity;
-                uniform sampler2D sampler;
-                void main(void) {
-                    gl_FragColor = vec4(normalize(vTransformedNormal), 1.0);
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @normalsProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec3 vertexNormal;
-                attribute vec3 vertexColor;
-                attribute vec2 textureCoord;
-                uniform mat4 mvMatrix;
-                uniform mat4 pMatrix;
-                uniform mat3 nMatrix;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                void main(void) {
-                    vPosition = mvMatrix * vec4(vertexPosition, 1.0);
-                    gl_Position = pMatrix * vPosition;
-                    vTextureCoord = textureCoord;
-                    vColor = vertexColor;
-                    vTransformedNormal = nMatrix * vertexNormal;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @normalsProgram.compileShader(window.XylemShaders.generateGbufferNormals.f, @gl.FRAGMENT_SHADER)
+        @normalsProgram.compileShader(window.XylemShaders.generateGbufferNormals.v, @gl.VERTEX_SHADER)
         @normalsProgram.linkProgram()
 
         @albedoProgram = new ShaderProgram(@gl)
-        @albedoProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                uniform float textureOpacity;
-                uniform sampler2D sampler;
-                void main(void) {
-                    gl_FragColor =  vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @albedoProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec3 vertexNormal;
-                attribute vec3 vertexColor;
-                attribute vec2 textureCoord;
-                uniform mat4 mvMatrix;
-                uniform mat4 pMatrix;
-                uniform mat3 nMatrix;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                void main(void) {
-                    vPosition = mvMatrix * vec4(vertexPosition, 1.0);
-                    gl_Position = pMatrix * vPosition;
-                    vTextureCoord = textureCoord;
-                    vColor = vertexColor;
-                    vTransformedNormal = nMatrix * vertexNormal;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @albedoProgram.compileShader(window.XylemShaders.generateGbufferAlbedo.f, @gl.FRAGMENT_SHADER)
+        @albedoProgram.compileShader(window.XylemShaders.generateGbufferAlbedo.v, @gl.VERTEX_SHADER)
         @albedoProgram.linkProgram()
 
         @positionProgram = new ShaderProgram(@gl)
-        @positionProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                uniform float textureOpacity;
-                uniform sampler2D sampler;
-                void main(void) {
-                    gl_FragColor = vPosition;
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @positionProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec3 vertexNormal;
-                attribute vec3 vertexColor;
-                attribute vec2 textureCoord;
-                uniform mat4 mvMatrix;
-                uniform mat4 pMatrix;
-                uniform mat3 nMatrix;
-                varying vec2 vTextureCoord;
-                varying vec3 vTransformedNormal;
-                varying vec3 vColor;
-                varying vec4 vPosition;
-                void main(void) {
-                    vPosition = mvMatrix * vec4(vertexPosition, 1.0);
-                    gl_Position = pMatrix * vPosition;
-                    vTextureCoord = textureCoord;
-                    vColor = vertexColor;
-                    vTransformedNormal = nMatrix * vertexNormal;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @positionProgram.compileShader(window.XylemShaders.generateGbufferPosition.f, @gl.FRAGMENT_SHADER)
+        @positionProgram.compileShader(window.XylemShaders.generateGbufferPosition.v, @gl.VERTEX_SHADER)
         @positionProgram.linkProgram()
 
     populate: (drawWithShader)->

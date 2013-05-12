@@ -90,35 +90,11 @@ class Xylem
         callback()
     
     draw: ()->
-        #consider drawing to same layer w/ additive blend mode?
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
         @gBuffer.albedoTexture.bind(0)
         @albedoProgram = new ShaderProgram(@gl)
-        @albedoProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                uniform sampler2D albedos;
-                uniform vec3 ambientColor;
-                void main(void) {
-                    vec4 albedo = texture2D(albedos, vTextureCoord);
-                    gl_FragColor = vec4(albedo.rgb * ambientColor, albedo.a);
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @albedoProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec2 textureCoord;
-                varying vec2 vTextureCoord;
-                void main(void) {
-                    gl_Position = vec4(vertexPosition, 1.0);
-                    vTextureCoord = textureCoord;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.f, @gl.FRAGMENT_SHADER)
+        @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.v, @gl.VERTEX_SHADER)
         @albedoProgram.linkProgram()
         @albedoProgram.enableProgram()
         @albedoProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
@@ -139,47 +115,8 @@ class Xylem
         @gBuffer.albedoTexture.bind(1)
         @gBuffer.positionTexture.bind(2)
         @lightingProgram = new ShaderProgram(@gl)
-        @lightingProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                uniform sampler2D normals;
-                uniform sampler2D albedos;
-                uniform sampler2D positions;
-                uniform vec3 ambientColor;
-                uniform vec3 pointLightingLocation;
-                uniform vec3 pointLightingSpecularColor;
-                uniform vec3 pointLightingDiffuseColor;
-                uniform float specularHardness;
-                void main(void) {
-                    vec4 normal = texture2D(normals, vTextureCoord);
-                    vec4 albedo = texture2D(albedos, vTextureCoord);
-                    vec4 position = texture2D(positions, vTextureCoord);
-                    vec3 lightDirection = normalize(pointLightingLocation - position.xyz);
-                    vec3 eyeDirection = normalize(-position.xyz);
-                    vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
-                    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
-                    float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
-                    vec3 lightWeighting = pointLightingSpecularColor * specularLightWeighting
-                        + pointLightingDiffuseColor * diffuseLightWeighting;
-
-                    gl_FragColor = vec4(albedo.rgb * lightWeighting, albedo.a);
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @lightingProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec2 textureCoord;
-                varying vec2 vTextureCoord;
-                void main(void) {
-                    gl_Position = vec4(vertexPosition, 1.0);
-                    vTextureCoord = textureCoord;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.f , @gl.FRAGMENT_SHADER)
+        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.v, @gl.VERTEX_SHADER)
         @lightingProgram.linkProgram()
         @lightingProgram.enableProgram()
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
