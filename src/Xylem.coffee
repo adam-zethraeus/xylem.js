@@ -15,8 +15,6 @@ class Xylem
         gl.enable(gl.CULL_FACE)
         gl.cullFace(gl.BACK)
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
-        gl.disable(gl.BLEND)
-        gl.enable(gl.DEPTH_TEST)
         gl.depthFunc(gl.LEQUAL)
         gl.getExtension('OES_texture_float') or throw "No floating point texture support."
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
@@ -102,7 +100,9 @@ class Xylem
         @lightingProgram.linkProgram()
 
     draw: ()->
+        @gl.enable(@gl.DEPTH_TEST)
         @gBuffer.populate((x)=>@sceneGraph.draw(x))
+        @gl.disable(@gl.DEPTH_TEST)
         @gBuffer.albedoTexture.bind(0)
         @albedoProgram.enableProgram()
         @albedoProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
@@ -131,7 +131,6 @@ class Xylem
         @lightingProgram.setUniform1i("albedos", 1)
         @lightingProgram.setUniform1i("positions", 2)
         @gl.enable(@gl.BLEND)
-        @gl.disable(@gl.DEPTH_TEST)
         @gl.blendFunc(@gl.ONE, @gl.ONE)
         for light in lights
             pos = vec4.create()
@@ -144,7 +143,6 @@ class Xylem
                     @screenQuad.draw(@lightingProgram)
                 false
             )
-        @gl.enable(@gl.DEPTH_TEST)
         @gl.disable(@gl.BLEND)
         @lightingProgram.disableAttribute("vertexPosition")
         @lightingProgram.disableAttribute("textureCoord")
