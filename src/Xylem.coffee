@@ -4,10 +4,7 @@ class Xylem
         @gl = null
         @sceneGraph = null
         @gl = @initializeGL(canvas)
-        @gBuffer = new GBuffer(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
-        @buffers = [new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
-                    new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
-        @currBuffer = 0
+        @setUpRendering(canvas)
         @screenQuad = new FullscreenQuad(@gl)
 
     initializeGL: (canvas)->
@@ -89,13 +86,25 @@ class Xylem
 
         callback()
     
-    draw: ()->
-        @gBuffer.populate((x)=>@sceneGraph.draw(x))
-        @gBuffer.albedoTexture.bind(0)
+    setUpRendering: (canvas)->
+        @gBuffer = new GBuffer(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+        @buffers = [new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
+                    new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
+        @currBuffer = 0
+
         @albedoProgram = new ShaderProgram(@gl)
         @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.f, @gl.FRAGMENT_SHADER)
         @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.v, @gl.VERTEX_SHADER)
         @albedoProgram.linkProgram()
+
+        @lightingProgram = new ShaderProgram(@gl)
+        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.f , @gl.FRAGMENT_SHADER)
+        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.v, @gl.VERTEX_SHADER)
+        @lightingProgram.linkProgram()
+
+    draw: ()->
+        @gBuffer.populate((x)=>@sceneGraph.draw(x))
+        @gBuffer.albedoTexture.bind(0)
         @albedoProgram.enableProgram()
         @albedoProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
         @albedoProgram.enableAttribute("vertexPosition")
@@ -110,14 +119,9 @@ class Xylem
         @albedoProgram.disableAttribute("vertexPosition")
         @albedoProgram.disableAttribute("textureCoord")
 
-
         @gBuffer.normalsTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
         @gBuffer.positionTexture.bind(2)
-        @lightingProgram = new ShaderProgram(@gl)
-        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.f , @gl.FRAGMENT_SHADER)
-        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.v, @gl.VERTEX_SHADER)
-        @lightingProgram.linkProgram()
         @lightingProgram.enableProgram()
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         lights = @sceneGraph.getNodesOfType(SceneLight)
