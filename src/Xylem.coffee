@@ -100,8 +100,11 @@ class Xylem
         @lightingProgram.linkProgram()
 
     draw: ()->
+        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
+        lights = @sceneGraph.getNodesOfType(SceneLight)
+        origin = vec4.fromValues(0, 0, 0, 1)
         @gl.enable(@gl.DEPTH_TEST)
-        @gBuffer.populate((x)=>@sceneGraph.draw(x))
+        @gBuffer.populate((x)=>@sceneGraph.draw(x, camera))
         @gl.disable(@gl.DEPTH_TEST)
         @gBuffer.albedoTexture.bind(0)
         @albedoProgram.enableProgram()
@@ -122,9 +125,6 @@ class Xylem
         @gBuffer.albedoTexture.bind(1)
         @gBuffer.positionTexture.bind(2)
         @lightingProgram.enableProgram()
-        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
-        lights = @sceneGraph.getNodesOfType(SceneLight)
-        origin = vec4.fromValues(0, 0, 0, 1)
         @lightingProgram.enableAttribute("vertexPosition")
         @lightingProgram.enableAttribute("textureCoord")
         @lightingProgram.setUniform1i("normals", 0)

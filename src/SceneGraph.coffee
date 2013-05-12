@@ -25,11 +25,10 @@ class SceneGraph
                 preOrder(child, type, act)
         preOrder(@rootNode, type, act)
 
-    draw: (shaderProgram)->
+    draw: (shaderProgram, camera)->
         startingModelMatrix = mat4.create()
         mat4.identity(startingModelMatrix)
         @rootNode.accumulateModelMatrix(startingModelMatrix)
-        camera = @getNodesOfType(SceneCamera)[0]
         @actOnNodesOfType(SceneObject, (object)->
             mvMatrix = mat4.create()
             mat4.multiply(mvMatrix, camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix())
