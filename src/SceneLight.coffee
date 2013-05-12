@@ -6,7 +6,6 @@ class SceneLight extends SceneNode
             @type = type
         else
             @type = "point"
-        @ambientColor = null
         @diffuseColor = null
         @specularColor = null
         @specularHardness = null
@@ -34,6 +33,5 @@ class SceneLight extends SceneNode
     setUniforms: (shaderProgram, translation)->
         shaderProgram.setUniform3f("pointLightingDiffuseColor", @diffuseColor)
         shaderProgram.setUniform3f("pointLightingSpecularColor", @specularColor)
-        shaderProgram.setUniform3f("ambientColor", @ambientColor)
         shaderProgram.setUniform3f("pointLightingLocation", translation)
         shaderProgram.setUniform1f("specularHardness", @specularHardness)
