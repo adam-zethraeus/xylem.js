@@ -8,6 +8,8 @@ Status: Functional deferred rendering supporting multiple point lights.
 
 Near term to do:
 * Light attenuations
-* Proper setting of ambient light
+* Proper map setting for ambient light
+* SSAO
+* Optional MRT support for Chrome dev branches
 * Spot lights
 * Shadow Maps
