@@ -5,12 +5,17 @@ class SceneCamera extends SceneNode
         @viewMatrix = mat4.create()
         @projectionMatrix = mat4.create()
         @cumulativeViewMatrix = mat4.create()
+        @inverseProjectionMatrix = mat4.create()
 
-    setProperties: (fov, viewportWidth, viewportHeight, nearClip, farClip)->
+    setProperties: (fov, viewportWidth, viewportHeight, @nearClip, @farClip)->
         mat4.perspective(@projectionMatrix, fov, viewportWidth / viewportHeight, nearClip, farClip)
+        mat4.invert(@inverseProjectionMatrix, @projectionMatrix)
 
     getProjectionMatrix: ()->
         return @projectionMatrix
+
+    getInverseProjectionMatrix: ()->
+        return @inverseProjectionMatrix
 
     getViewMatrix: ()->
         @recalculateViewMatrix()

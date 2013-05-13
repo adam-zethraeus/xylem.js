@@ -24,20 +24,23 @@ window.XylemShaders = {
         f   :   "
                 precision mediump float;
                 varying vec2 vTextureCoord;
+                varying vec4 vPosition;
                 uniform sampler2D normals;
                 uniform sampler2D albedos;
-                uniform sampler2D positions;
                 uniform vec3 ambientColor;
                 uniform vec3 pointLightingLocation;
                 uniform vec3 pointLightingSpecularColor;
                 uniform vec3 pointLightingDiffuseColor;
                 uniform float specularHardness;
+                uniform float farClip;
                 void main(void) {
                     vec4 normal = texture2D(normals, vTextureCoord);
                     vec4 albedo = texture2D(albedos, vTextureCoord);
-                    vec4 position = texture2D(positions, vTextureCoord);
-                    vec3 lightDirection = normalize(pointLightingLocation - position.xyz);
-                    vec3 eyeDirection = normalize(-position.xyz);
+                    float depth = texture2D(normals, vTextureCoord).a;
+                    vec3 viewRay = vec3(vPosition.xy * (-farClip/vPosition.z), -farClip);
+                    vec3 position = viewRay * depth;
+                    vec3 lightDirection = normalize(pointLightingLocation - position);
+                    vec3 eyeDirection = normalize(-position);
                     vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
                     float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
                     float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
@@ -51,8 +54,11 @@ window.XylemShaders = {
                 attribute vec3 vertexPosition;
                 attribute vec2 textureCoord;
                 varying vec2 vTextureCoord;
+                varying vec4 vPosition;
+                uniform mat4 pMatrix;
                 void main(void) {
                     gl_Position = vec4(vertexPosition, 1.0);
+                    vPosition =  pMatrix * gl_Position;
                     vTextureCoord = textureCoord;
                 }
                 "
@@ -64,10 +70,11 @@ window.XylemShaders = {
                 varying vec3 vTransformedNormal;
                 varying vec3 vColor;
                 varying vec4 vPosition;
+                varying float vDepth;
                 uniform float textureOpacity;
                 uniform sampler2D sampler;
                 void main(void) {
-                    gl_FragColor = vec4(normalize(vTransformedNormal), 1.0);
+                    gl_FragColor = vec4(normalize(vTransformedNormal), vDepth);
                 }
                 ",
         v   :   "
@@ -78,16 +85,19 @@ window.XylemShaders = {
                 uniform mat4 mvMatrix;
                 uniform mat4 pMatrix;
                 uniform mat3 nMatrix;
+                uniform float farClip;
                 varying vec2 vTextureCoord;
                 varying vec3 vTransformedNormal;
                 varying vec3 vColor;
                 varying vec4 vPosition;
+                varying float vDepth;
                 void main(void) {
                     vPosition = mvMatrix * vec4(vertexPosition, 1.0);
                     gl_Position = pMatrix * vPosition;
                     vTextureCoord = textureCoord;
                     vColor = vertexColor;
                     vTransformedNormal = nMatrix * vertexNormal;
+                    vDepth = -vPosition.z / farClip;
                 }
                 "
     },

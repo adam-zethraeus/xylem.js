@@ -34,6 +34,7 @@ class SceneGraph
             mat4.multiply(mvMatrix, camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix())
             shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
             shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
+            shaderProgram.setUniform1f("farClip", camera.farClip)
             normalMatrix = mat3.create()
             mat3.fromMat4(normalMatrix, mvMatrix)
             mat3.invert(normalMatrix, normalMatrix)

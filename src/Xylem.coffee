@@ -121,15 +121,15 @@ class Xylem
         @albedoProgram.disableAttribute("vertexPosition")
         @albedoProgram.disableAttribute("textureCoord")
 
-        @gBuffer.normalsTexture.bind(0)
+        @gBuffer.normalsDepthTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
-        @gBuffer.positionTexture.bind(2)
         @lightingProgram.enableProgram()
+        @lightingProgram.setUniform1f("farClip", camera.farClip);
+        @lightingProgram.setUniformMatrix4fv("pMatrix", camera.getInverseProjectionMatrix())
         @lightingProgram.enableAttribute("vertexPosition")
         @lightingProgram.enableAttribute("textureCoord")
         @lightingProgram.setUniform1i("normals", 0)
         @lightingProgram.setUniform1i("albedos", 1)
-        @lightingProgram.setUniform1i("positions", 2)
         @gl.enable(@gl.BLEND)
         @gl.blendFunc(@gl.ONE, @gl.ONE)
         for light in lights
