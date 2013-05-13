@@ -7,8 +7,7 @@ A browser based deferred renderer.
 Status: Functional deferred rendering supporting multiple point lights.
 
 Near term to do:
-
-    * Light attenuations
-    * Proper setting of ambient light
-    * Spot lights
-    * Shadow Maps
+* Light attenuations
+* Proper setting of ambient light
+* Spot lights
+* Shadow Maps
