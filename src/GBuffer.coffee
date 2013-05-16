@@ -4,13 +4,13 @@ class GBuffer
         @normalsDepthTexture = new Texture(@gl, dimensions, {internalRepresentation: @gl.FLOAT})
         @albedoTexture = new Texture(@gl, dimensions)
         @normalsDepthProgram = new ShaderProgram(@gl)
-        @normalsDepthProgram.compileShader(window.XylemShaders.generateGbufferNormals.f, @gl.FRAGMENT_SHADER)
-        @normalsDepthProgram.compileShader(window.XylemShaders.generateGbufferNormals.v, @gl.VERTEX_SHADER)
+        @normalsDepthProgram.importShader("generateNormalsAndDepth_f")
+        @normalsDepthProgram.importShader("generateNormalsAndDepth_v")
         @normalsDepthProgram.linkProgram()
 
         @albedoProgram = new ShaderProgram(@gl)
-        @albedoProgram.compileShader(window.XylemShaders.generateGbufferAlbedo.f, @gl.FRAGMENT_SHADER)
-        @albedoProgram.compileShader(window.XylemShaders.generateGbufferAlbedo.v, @gl.VERTEX_SHADER)
+        @albedoProgram.importShader("generateAlbedo_f")
+        @albedoProgram.importShader("generateAlbedo_v")
         @albedoProgram.linkProgram()
 
     populate: (drawWithShader)->

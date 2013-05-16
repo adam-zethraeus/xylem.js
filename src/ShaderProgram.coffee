@@ -5,9 +5,20 @@ class ShaderProgram
         @shaders = []
         @attributes = {}
 
-    compileShader: (text, type)->
-        glShader = @gl.createShader(type)
-        @gl.shaderSource(glShader, text)
+    importShader: (id)->
+        script = document.getElementById(id)
+        throw "shader: " + id + " could not be found." if not script
+        shaderString = ""
+        node = script.firstChild
+        while node
+            if node.nodeType
+                shaderString += node.textContent
+            node = node.nextSibling
+        if script.type is "x-shader/x-fragment"
+            glShader = @gl.createShader(@gl.FRAGMENT_SHADER)
+        else if script.type is "x-shader/x-vertex"
+            glShader = @gl.createShader(@gl.VERTEX_SHADER)
+        @gl.shaderSource(glShader, shaderString)
         @gl.compileShader(glShader)  
         throw "A shader would not compile." if not @gl.getShaderParameter(glShader, @gl.COMPILE_STATUS)
         @shaders.push(glShader)

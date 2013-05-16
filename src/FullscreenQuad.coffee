@@ -34,29 +34,8 @@ class FullscreenQuad
         @indexBuffer.numItems = indices.length
 
         @blitProgram = new ShaderProgram(@gl)
-        @blitProgram.compileShader(
-            "
-                precision mediump float;
-                varying vec2 vTextureCoord;
-                uniform sampler2D sampler;
-                void main(void) {
-                    gl_FragColor = texture2D(sampler, vTextureCoord);
-                }
-            "
-            @gl.FRAGMENT_SHADER
-        )
-        @blitProgram.compileShader(
-            "
-                attribute vec3 vertexPosition;
-                attribute vec2 textureCoord;
-                varying vec2 vTextureCoord;
-                void main(void) {
-                    gl_Position = vec4(vertexPosition, 1.0);
-                    vTextureCoord = textureCoord;
-                }
-            "
-            @gl.VERTEX_SHADER
-        )
+        @blitProgram.importShader("blitShader_f")
+        @blitProgram.importShader("blitShader_v")
         @blitProgram.linkProgram()
 
     draw: (shaderProgram)->

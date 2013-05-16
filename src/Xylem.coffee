@@ -89,15 +89,15 @@ class Xylem
                     new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
         @currBuffer = 0
 
-        @albedoProgram = new ShaderProgram(@gl)
-        @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.f, @gl.FRAGMENT_SHADER)
-        @albedoProgram.compileShader(window.XylemShaders.albedoFromGbuffer.v, @gl.VERTEX_SHADER)
-        @albedoProgram.linkProgram()
+        @ambientProgram = new ShaderProgram(@gl)
+        @ambientProgram.importShader("ambientPass_f")
+        @ambientProgram.importShader("ambientPass_v")
+        @ambientProgram.linkProgram()
 
-        @lightingProgram = new ShaderProgram(@gl)
-        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.f , @gl.FRAGMENT_SHADER)
-        @lightingProgram.compileShader(window.XylemShaders.lightOverGbuffer.v, @gl.VERTEX_SHADER)
-        @lightingProgram.linkProgram()
+        @pointLightingProgram = new ShaderProgram(@gl)
+        @pointLightingProgram.importShader("pointLightPass_f")
+        @pointLightingProgram.importShader("pointLightPass_v")
+        @pointLightingProgram.linkProgram()
 
     draw: ()->
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
@@ -107,29 +107,29 @@ class Xylem
         @gBuffer.populate((x)=>@sceneGraph.draw(x, camera))
         @gl.disable(@gl.DEPTH_TEST)
         @gBuffer.albedoTexture.bind(0)
-        @albedoProgram.enableProgram()
-        @albedoProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
-        @albedoProgram.enableAttribute("vertexPosition")
-        @albedoProgram.enableAttribute("textureCoord")
-        @albedoProgram.setUniform1i("albedos", 0)
+        @ambientProgram.enableProgram()
+        @ambientProgram.setUniform3f("ambientColor", [0.2, 0.2, 0.2])
+        @ambientProgram.enableAttribute("vertexPosition")
+        @ambientProgram.enableAttribute("textureCoord")
+        @ambientProgram.setUniform1i("albedos", 0)
         @buffers[@currBuffer].drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT)
-                @screenQuad.draw(@albedoProgram)
+                @screenQuad.draw(@ambientProgram)
             false
         )
-        @albedoProgram.disableAttribute("vertexPosition")
-        @albedoProgram.disableAttribute("textureCoord")
+        @ambientProgram.disableAttribute("vertexPosition")
+        @ambientProgram.disableAttribute("textureCoord")
 
         @gBuffer.normalsDepthTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
-        @lightingProgram.enableProgram()
-        @lightingProgram.setUniform1f("farClip", camera.farClip);
-        @lightingProgram.setUniformMatrix4fv("pMatrix", camera.getInverseProjectionMatrix())
-        @lightingProgram.enableAttribute("vertexPosition")
-        @lightingProgram.enableAttribute("textureCoord")
-        @lightingProgram.setUniform1i("normals", 0)
-        @lightingProgram.setUniform1i("albedos", 1)
+        @pointLightingProgram.enableProgram()
+        @pointLightingProgram.setUniform1f("farClip", camera.farClip);
+        @pointLightingProgram.setUniformMatrix4fv("pMatrix", camera.getInverseProjectionMatrix())
+        @pointLightingProgram.enableAttribute("vertexPosition")
+        @pointLightingProgram.enableAttribute("textureCoord")
+        @pointLightingProgram.setUniform1i("normals", 0)
+        @pointLightingProgram.setUniform1i("albedos", 1)
         @gl.enable(@gl.BLEND)
         @gl.blendFunc(@gl.ONE, @gl.ONE)
         for light in lights
@@ -137,15 +137,15 @@ class Xylem
             lightMVMatrix = mat4.create()
             mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
             vec4.transformMat4(pos, origin, lightMVMatrix)
-            light.setUniforms(@lightingProgram, [pos[0], pos[1], pos[2]])
+            light.setUniforms(@pointLightingProgram, [pos[0], pos[1], pos[2]])
             @buffers[@currBuffer].drawTo(
                 ()=>
-                    @screenQuad.draw(@lightingProgram)
+                    @screenQuad.draw(@pointLightingProgram)
                 false
             )
         @gl.disable(@gl.BLEND)
-        @lightingProgram.disableAttribute("vertexPosition")
-        @lightingProgram.disableAttribute("textureCoord")
+        @pointLightingProgram.disableAttribute("vertexPosition")
+        @pointLightingProgram.disableAttribute("textureCoord")
 
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
