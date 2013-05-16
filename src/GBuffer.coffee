@@ -1,7 +1,7 @@
 class GBuffer
 
     constructor: (@gl, dimensions)->
-        @normalsDepthTexture = new Texture(@gl, dimensions)
+        @normalsDepthTexture = new Texture(@gl, dimensions, {internalRepresentation: @gl.FLOAT})
         @albedoTexture = new Texture(@gl, dimensions)
         @normalsDepthProgram = new ShaderProgram(@gl)
         @normalsDepthProgram.compileShader(window.XylemShaders.generateGbufferNormals.f, @gl.FRAGMENT_SHADER)

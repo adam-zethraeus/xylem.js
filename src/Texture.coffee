@@ -1,12 +1,13 @@
 class Texture
 
-    constructor: (@gl, @dimensions)->
+    constructor: (@gl, @dimensions, options)->
+        options = options or {}
         @id = @gl.createTexture()
         @gl.bindTexture(@gl.TEXTURE_2D, @id)
         @gl.pixelStorei(@gl.UNPACK_FLIP_Y_WEBGL, true)
-        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.LINEAR);
-        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.LINEAR);
-        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @dimensions[0], @dimensions[1], 0, @gl.RGBA, @gl.FLOAT, null)
+        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, options.magFilter or @gl.LINEAR);
+        @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, options.minFilter or @gl.LINEAR);
+        @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @dimensions[0], @dimensions[1], 0, options.format or @gl.RGBA, options.internalRepresentation or @gl.UNSIGNED_BYTE, null)
         @gl.bindTexture(@gl.TEXTURE_2D, null)
         @framebuffer = null
         @renderbuffer = null
