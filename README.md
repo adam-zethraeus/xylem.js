@@ -2,7 +2,7 @@
 
 A browser based deferred renderer.
 
-![cornell box with teapot](notes/ss_2012-05-06.png)
+![cornell box with teapot](notes/ss_2013-05-17.png)
 
 Status: Functional deferred rendering supporting multiple point lights.
 
