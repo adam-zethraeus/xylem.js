@@ -99,6 +99,11 @@ class Xylem
         @pointLightingProgram.importShader("pointLightPass_v")
         @pointLightingProgram.linkProgram()
 
+        @fxaaProgram = new ShaderProgram(@gl)
+        @fxaaProgram.importShader("fxaaShader_f")
+        @fxaaProgram.importShader("fxaaShader_v")
+        @fxaaProgram.linkProgram()
+
     draw: ()->
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         lights = @sceneGraph.getNodesOfType(SceneLight)
@@ -146,6 +151,21 @@ class Xylem
         @gl.disable(@gl.BLEND)
         @pointLightingProgram.disableAttribute("vertexPosition")
         @pointLightingProgram.disableAttribute("textureCoord")
+
+        @buffers[@currBuffer].bind(0)
+        @fxaaProgram.enableProgram()
+        @fxaaProgram.setUniform1i("tex", 0)
+        @fxaaProgram.setUniform2f("viewportDimensions", [nextHighestPowerOfTwo(@gl.viewportWidth), nextHighestPowerOfTwo(@gl.viewportHeight)])
+        @fxaaProgram.enableAttribute("vertexPosition")
+        @fxaaProgram.enableAttribute("textureCoord")
+        @currBuffer = @currBuffer ^ 1
+        @buffers[@currBuffer].drawTo(
+            ()=>
+                @screenQuad.draw(@fxaaProgram)
+            false
+        )
+        @fxaaProgram.disableAttribute("vertexPosition")
+        @fxaaProgram.disableAttribute("textureCoord")
 
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 

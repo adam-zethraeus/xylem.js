@@ -54,6 +54,9 @@ class ShaderProgram
     
     setUniform1i: (name, value)->
         @gl.uniform1i(@gl.getUniformLocation(@program, name), value)
+
+    setUniform2f: (name, values)->
+        @gl.uniform2f(@gl.getUniformLocation(@program, name), values[0], values[1])
     
     setUniform3f: (name, values)->
         @gl.uniform3f(@gl.getUniformLocation(@program, name), values[0], values[1], values[2])
