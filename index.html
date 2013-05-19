@@ -15,6 +15,7 @@
 <script src="libraries/browserVersionOf.js"></script>
 <script src="libraries/degreesToRadians.js"></script>
 <script src="libraries/powerOfTwo.js"></script>
+<script src="libraries/stats/build/stats.min.js"></script>
 <script src="xylem.js"></script>
 <script id="ambientPass_f" type="x-shader/x-fragment">
     precision mediump float;
@@ -227,6 +228,25 @@ void main(){
 </script>
 <script>
 window.onload = function(){
+    var stats = new Stats();
+    stats.setMode(0); // 0: fps, 1: ms
+
+    // Align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+
+    document.body.appendChild( stats.domElement );
+
+    setInterval( function () {
+
+            stats.begin();
+
+                // your code goes here
+
+                    stats.end();
+
+    }, 1000 / 60 );
     var x = new Xylem(document.getElementById("render_canvas")),
         sceneUrl = "scenes/cornell.scene.json",
         scene = null;
