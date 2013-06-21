@@ -56,6 +56,9 @@ class Xylem
                 node.setDiffuseColor(getOrThrow(obj, "diffuseColor"))
                 node.setSpecularColor(getOrThrow(obj, "specularColor"))
                 node.setSpecularHardness(getOrThrow(obj, "specularHardness"))
+                node.setConstantAttenuation(getOrThrow(obj, "constantAttenuation"))
+                node.setLinearAttenuation(getOrThrow(obj, "linearAttenuation"))
+                node.setQuadraticAttenuation(getOrThrow(obj, "quadraticAttenuation"))
             else if type is "camera"
                 node = new SceneCamera()
                 node.setProperties(

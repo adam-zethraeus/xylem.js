@@ -42,7 +42,10 @@
                     "translate" : [-0.4, 0.2, 0.4],
                     "diffuseColor" : [0.8, 0.8, 0.8],
                     "specularColor" : [0.8, 0.8, 0.8],
-                    "specularHardness" : 32
+                    "specularHardness" : 16,
+                    "constantAttenuation" : 0.1,
+                    "linearAttenuation" : 0.0,
+                    "quadraticAttenuation" : 0.005 
                 },
                 {
                     "name" : "light_2",
@@ -50,8 +53,11 @@
                     "lightType" : "point",
                     "translate" : [0.4, -0.2, 0.4],
                     "diffuseColor" : [0.3, 0.8, 0.8],
-                    "specularColor" : [0.8, 0.8, 0.8],
-                    "specularHardness" : 32
+                    "specularColor" : [0.3, 0.8, 0.8],
+                    "specularHardness" : 16,
+                    "constantAttenuation" : 0.1,
+                    "linearAttenuation" : 0.0,
+                    "quadraticAttenuation" : 0.01
                 },
                 {
                     "name" : "cuboid_1",

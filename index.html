@@ -43,9 +43,12 @@
     uniform sampler2D normals;
     uniform sampler2D albedos;
     uniform vec3 ambientColor;
-    uniform vec3 pointLightingLocation;
-    uniform vec3 pointLightingSpecularColor;
-    uniform vec3 pointLightingDiffuseColor;
+    uniform vec3 pointLightLocation;
+    uniform vec3 pointLightSpecularColor;
+    uniform vec3 pointLightDiffuseColor;
+    uniform float constantAttenuation;
+    uniform float linearAttenuation;
+    uniform float quadraticAttenuation;
     uniform float specularHardness;
     uniform float farClip;
     void main(void) {
@@ -54,15 +57,16 @@
         float depth = texture2D(normals, vTextureCoord).a;
         vec3 viewRay = vec3(vPosition.xy * (-farClip/vPosition.z), -farClip);
         vec3 position = viewRay * depth;
-        vec3 lightDirection = normalize(pointLightingLocation - position);
+        vec3 lightDirection = normalize(pointLightLocation - position);
+        float distance = length(position - pointLightLocation);
         vec3 eyeDirection = normalize(-position);
         vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
         float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
         float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
-        vec3 lightWeighting = pointLightingSpecularColor * specularLightWeighting
-            + pointLightingDiffuseColor * diffuseLightWeighting;
-
-        gl_FragColor = vec4(albedo.rgb * lightWeighting, albedo.a);
+        float brightness = max(1.0 - (constantAttenuation + distance * (linearAttenuation + distance * quadraticAttenuation)), 0.0);
+        vec3 lightWeighting = pointLightSpecularColor * specularLightWeighting + pointLightDiffuseColor * diffuseLightWeighting;
+        lightWeighting = vec3(min(lightWeighting.x, 1.0), min(lightWeighting.y, 1.0), min(lightWeighting.z, 1.0));
+        gl_FragColor = vec4(albedo.rgb * lightWeighting * brightness, albedo.a);
     }
 </script>
 <script id="pointLightPass_v" type="x-shader/x-vertex">
