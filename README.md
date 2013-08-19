@@ -19,9 +19,9 @@ Status: Functional deferred rendering supporting multiple point lights.
 
 ##Getting Xylem running:
 * Clone this repository
-* > `cd xylem.js/`
-* > `git submodule init`
-* > `git submodule update`
-* > `cake build`
-* > `python -m SimpleHTTPServer 8888`
-* Navigate to (localhost:8888)[http://localhost:8888/] in a web browser
+* `cd xylem.js/`
+* `git submodule init`
+* `git submodule update`
+* `cake build`
+* `python -m SimpleHTTPServer 8888`
+* Navigate to [localhost:8888](http://localhost:8888/) in a web browser
