@@ -17,6 +17,7 @@ class Xylem
         gl.clearColor(0.0, 0.0, 0.0, 1.0)
         gl.depthFunc(gl.LEQUAL)
         gl.getExtension('OES_texture_float') or throw "No floating point texture support."
+        gl.getExtension('OES_texture_float_linear') or throw "No linear filtering support for floating point textures."
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         return gl
 
