@@ -11,7 +11,6 @@ class Model
         @textureOpacity = null
 
     loadModel: (model)->
-
         @textureOpacity = model.textureOpacity
 
         @buffers.vertexNormalBuffer = @gl.createBuffer()
@@ -77,5 +76,7 @@ class Model
             texture.bind(bindLocation)
             shaderProgram.setUniform1i("sampler", bindLocation)
         @gl.drawElements(@gl.TRIANGLES, @buffers.indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
+        # for i in [0..@buffers.indexBuffer.numItems-3] by 3
+        #     @gl.drawElements(@gl.LINE_LOOP, 3, @gl.UNSIGNED_SHORT, i*2)
         if @textureOpacity > 0
             texture.unbind(bindLocation)
