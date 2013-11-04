@@ -14,6 +14,9 @@ class Xylem
         else
             @drawFunction = @draw
 
+    toggleAntiAliase: ()->
+        @antiAliase = not @antiAliase
+
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") or canvas.getContext("experimental-webgl")
         gl or throw "Could not initialize WebGL."

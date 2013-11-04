@@ -288,11 +288,15 @@ window.onload = function(){
     document.getElementById("wireframe_toggle").onclick = function(){
         x.toggleDrawType();
     }
+    document.getElementById("aa_toggle").onclick = function(){
+        x.toggleAntiAliase();
+    }
 }
 </script>
 </head>
 <body>
-    <canvas id="render_canvas" width="640" height="480"></canvas>
+    <canvas id="render_canvas" width="512" height="512"></canvas>
     <button id="wireframe_toggle">Toggle Wireframe</button>
+    <button id="aa_toggle">Toggle AntiAliasing</button>
 </body>
 </html>
