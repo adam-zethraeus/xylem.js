@@ -1,11 +1,12 @@
 class Xylem
 
     constructor: (canvas)->
-        @gl = null
         @sceneGraph = null
         @gl = @initializeGL(canvas)
         @setUpRendering(canvas)
         @screenQuad = new FullscreenQuad(@gl)
+        @drawFunction = @draw
+        @antiAliase = false
 
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") or canvas.getContext("experimental-webgl")
@@ -92,7 +93,6 @@ class Xylem
         @buffers = [new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])
                     new Texture(@gl, [nextHighestPowerOfTwo(canvas.width), nextHighestPowerOfTwo(canvas.height)])]
         @currBuffer = 0
-
         @ambientProgram = new ShaderProgram(@gl)
         @ambientProgram.importShader("ambientPass_f")
         @ambientProgram.importShader("ambientPass_v")
@@ -108,12 +108,15 @@ class Xylem
         @fxaaProgram.importShader("fxaaShader_v")
         @fxaaProgram.linkProgram()
 
+    switchBuffers: ()->
+        @currBuffer = @currBuffer ^ 1
+
     draw: ()->
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         lights = @sceneGraph.getNodesOfType(SceneLight)
         origin = vec4.fromValues(0, 0, 0, 1)
         @gl.enable(@gl.DEPTH_TEST)
-        @gBuffer.populate((x)=>@sceneGraph.draw(x, camera))
+        @gBuffer.populate((shader)=>@sceneGraph.draw(shader, camera))
         @gl.disable(@gl.DEPTH_TEST)
         @gBuffer.albedoTexture.bind(0)
         @ambientProgram.enableProgram()
@@ -156,26 +159,38 @@ class Xylem
         @pointLightingProgram.disableAttribute("vertexPosition")
         @pointLightingProgram.disableAttribute("textureCoord")
 
-        @buffers[@currBuffer].bind(0)
-        @fxaaProgram.enableProgram()
-        @fxaaProgram.setUniform1i("tex", 0)
-        @fxaaProgram.setUniform2f("viewportDimensions", [nextHighestPowerOfTwo(@gl.viewportWidth), nextHighestPowerOfTwo(@gl.viewportHeight)])
-        @fxaaProgram.enableAttribute("vertexPosition")
-        @fxaaProgram.enableAttribute("textureCoord")
-        @currBuffer = @currBuffer ^ 1
-        @buffers[@currBuffer].drawTo(
-            ()=>
-                @screenQuad.draw(@fxaaProgram)
-            false
-        )
-        @fxaaProgram.disableAttribute("vertexPosition")
-        @fxaaProgram.disableAttribute("textureCoord")
+        if @antiAliase
+            @buffers[@currBuffer].bind(0)
+            @fxaaProgram.enableProgram()
+            @fxaaProgram.setUniform1i("tex", 0)
+            @fxaaProgram.setUniform2f("viewportDimensions", [nextHighestPowerOfTwo(@gl.viewportWidth), nextHighestPowerOfTwo(@gl.viewportHeight)])
+            @fxaaProgram.enableAttribute("vertexPosition")
+            @fxaaProgram.enableAttribute("textureCoord")
+            @switchBuffers()
+            @buffers[@currBuffer].drawTo(
+                ()=>
+                    @screenQuad.draw(@fxaaProgram)
+                false
+            )
+            @fxaaProgram.disableAttribute("vertexPosition")
+            @fxaaProgram.disableAttribute("textureCoord")
 
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
+    drawWireframe: ()->
+        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
+        origin = vec4.fromValues(0, 0, 0, 1)
+        @wireframeProgram.enableProgram()
+        @buffers[@currBuffer].drawTo(
+            ()=>
+                @gl.clear(@gl.COLOR_BUFFER_BIT)
+                @screenQuad.draw(@wireframeProgram)
+            false
+        )
+        @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
     mainLoop: ()->
-        @draw()
+        @drawFunction()
         browserVersionOf("requestAnimationFrame")(()=>@mainLoop())
 
 window.Xylem = Xylem
