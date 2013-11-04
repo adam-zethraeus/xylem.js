@@ -8,6 +8,12 @@ class Xylem
         @drawFunction = @draw
         @antiAliase = false
 
+    toggleDrawType: ()->
+        if @drawFunction is @draw
+            @drawFunction = @drawWireframe
+        else
+            @drawFunction = @draw
+
     initializeGL: (canvas)->
         gl = canvas.getContext("webgl") or canvas.getContext("experimental-webgl")
         gl or throw "Could not initialize WebGL."
@@ -15,7 +21,7 @@ class Xylem
         gl.viewportHeight = canvas.height
         gl.enable(gl.CULL_FACE)
         gl.cullFace(gl.BACK)
-        gl.clearColor(0.0, 0.0, 0.0, 1.0)
+        gl.clearColor(1.0, 1.0, 1.0, 1.0)
         gl.depthFunc(gl.LEQUAL)
         gl.getExtension('OES_texture_float') or throw "No floating point texture support."
         gl.getExtension('OES_texture_float_linear') or throw "No linear filtering support for floating point textures."
@@ -108,6 +114,11 @@ class Xylem
         @fxaaProgram.importShader("fxaaShader_v")
         @fxaaProgram.linkProgram()
 
+        @wireframeProgram = new ShaderProgram(@gl)
+        @wireframeProgram.importShader("wireframe_f")
+        @wireframeProgram.importShader("wireframe_v")
+        @wireframeProgram.linkProgram()
+
     switchBuffers: ()->
         @currBuffer = @currBuffer ^ 1
 
@@ -179,14 +190,16 @@ class Xylem
 
     drawWireframe: ()->
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
-        origin = vec4.fromValues(0, 0, 0, 1)
         @wireframeProgram.enableProgram()
+        @wireframeProgram.enableAttribute("vertexPosition")
         @buffers[@currBuffer].drawTo(
             ()=>
-                @gl.clear(@gl.COLOR_BUFFER_BIT)
-                @screenQuad.draw(@wireframeProgram)
-            false
+                @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
+                @sceneGraph.drawWireframe(@wireframeProgram, camera)
+            true
         )
+        @wireframeProgram.disableAttribute("vertexPosition")
+
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
     mainLoop: ()->

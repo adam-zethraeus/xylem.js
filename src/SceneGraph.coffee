@@ -42,3 +42,15 @@ class SceneGraph
             shaderProgram.setUniformMatrix3fv("nMatrix", normalMatrix)
             object.getGraphicalModel().draw(shaderProgram, object.getTexture())
         )
+
+    drawWireframe: (shaderProgram, camera)->
+        startingModelMatrix = mat4.create()
+        mat4.identity(startingModelMatrix)
+        @rootNode.accumulateModelMatrix(startingModelMatrix)
+        @actOnNodesOfType(SceneObject, (object)->
+            mvMatrix = mat4.create()
+            mat4.multiply(mvMatrix, camera.getCumulativeViewMatrix(), object.getCumulativeModelMatrix())
+            shaderProgram.setUniformMatrix4fv("mvMatrix", mvMatrix)
+            shaderProgram.setUniformMatrix4fv("pMatrix", camera.getProjectionMatrix())
+            object.getGraphicalModel().drawLines(shaderProgram)
+        )

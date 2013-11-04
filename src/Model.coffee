@@ -80,5 +80,8 @@ class Model
             texture.unbind(bindLocation)
 
     drawLines: (shaderProgram)->
+        @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
+        @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexPosition"), @buffers.vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
+        @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
         for i in [0 .. @buffers.indexBuffer.numItems - 3] by 3
             @gl.drawElements(@gl.LINE_LOOP, 3, @gl.UNSIGNED_SHORT, i * 2)

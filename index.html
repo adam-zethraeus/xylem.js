@@ -81,6 +81,22 @@
         vTextureCoord = textureCoord;
     }
 </script>
+<script id="wireframe_f" type="x-shader/x-fragment">
+    precision mediump float;
+    void main(void) {
+        gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    }
+</script>
+<script id="wireframe_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    uniform mat4 mvMatrix;
+    uniform mat4 pMatrix;
+    varying vec4 vPosition;
+    void main(void) {
+        vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+        gl_Position = pMatrix * vPosition;
+    }
+</script>
 <script id="generateNormalsAndDepth_f" type="x-shader/x-fragment">
     precision mediump float;
     varying vec2 vTextureCoord;
@@ -269,10 +285,14 @@ window.onload = function(){
         httpRequest.open("GET", sceneUrl, false); // sync
         httpRequest.send();
     x.loadScene(scene, function(){x.mainLoop();});
+    document.getElementById("wireframe_toggle").onclick = function(){
+        x.toggleDrawType();
+    }
 }
 </script>
 </head>
 <body>
     <canvas id="render_canvas" width="640" height="480"></canvas>
+    <button id="wireframe_toggle">Toggle Wireframe</button>
 </body>
 </html>
