@@ -241,22 +241,6 @@ void main(){
 </script>
 <script>
 window.onload = function(){
-    var stats = new Stats();
-    stats.setMode(0); // 0: fps, 1: ms
-
-    // Align top-left
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.left = '0px';
-    stats.domElement.style.top = '0px';
-
-    document.body.appendChild( stats.domElement );
-
-    setInterval( function () {
-
-            stats.begin();
-            stats.end();
-
-    }, 1000 / 60 );
     var x = new Xylem(document.getElementById("render_canvas")),
         sceneUrl = "scenes/cornell.scene.json",
         scene = null;
@@ -281,6 +265,22 @@ window.onload = function(){
     document.getElementById("aa_toggle").onclick = function(){
         x.toggleAntiAliase();
     }
+    document.getElementById("inject_stats").onclick = function(){
+        var stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+
+        document.body.appendChild( stats.domElement );
+
+        setInterval( function () {
+
+                stats.begin();
+                stats.end();
+
+        }, 1000 / 60 );
+    }
 }
 </script>
 </head>
@@ -288,5 +288,6 @@ window.onload = function(){
     <canvas id="render_canvas" width="1024" height="512"></canvas>
     <button id="wireframe_toggle">Toggle Wireframe</button>
     <button id="aa_toggle">Toggle AntiAliasing</button>
+    <button id="inject_stats">Inject Stats</button>
 </body>
 </html>
