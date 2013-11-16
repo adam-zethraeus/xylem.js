@@ -4,6 +4,11 @@
             "name" : "metal_texture",
             "url" : "textures/metal.jpg",
             "type" : "image"
+        },
+        {
+            "name" : "cornell_colors",
+            "url" : "textures/cornell_colors.png",
+            "type" : "image"
         }, {
             "name" : "teapot_model",
             "url" : "models/teapot.model.json",
@@ -34,6 +39,7 @@
             "translate" : [0, 0, 0],
             "scale" : [6, 6, 6],
             "model" : "cornell_box_model",
+            "texture" : "cornell_colors",
             "children" : [
                 {
                     "name" : "light_1",
