@@ -14,6 +14,10 @@
             "url" : "models/teapot.model.json",
             "type" : "json"
         }, {
+            "name" : "bunny_model",
+            "url" : "models/bunny.model.json",
+            "type" : "json"
+        }, {
             "name" : "cornell_box_model",
             "url" : "models/cornell.model.json",
             "type" : "json"
@@ -74,7 +78,20 @@
                     "rotation" : {
                         "degrees" : 20,
                         "axis" : [0, 1, 0]
-                    }
+                    },
+                    "children" : [
+                        {
+                            "name" : "bunny",
+                            "type" : "object",
+                            "translate" : [0, 0.09, 0],
+                            "scale" : [8.0, 8.0, 8.0],
+                            "model" : "bunny_model",
+                            "rotation" : {
+                                "degrees" : 100,
+                                "axis" : [1, 0, 0]
+                            }
+                        }
+                    ]
                 },
                 {
                     "name" : "cuboid_2",
