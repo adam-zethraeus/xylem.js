@@ -17,7 +17,6 @@ class GBuffer
         @normalsDepthProgram.enableProgram()
         @normalsDepthProgram.enableAttribute("vertexPosition")
         @normalsDepthProgram.enableAttribute("vertexNormal")
-        @normalsDepthProgram.enableAttribute("vertexColor")
         @normalsDepthProgram.enableAttribute("textureCoord")
         @normalsDepthTexture.drawTo(
             ()=>
@@ -27,13 +26,11 @@ class GBuffer
         )
         @normalsDepthProgram.disableAttribute("vertexPosition")
         @normalsDepthProgram.disableAttribute("vertexNormal")
-        @normalsDepthProgram.disableAttribute("vertexColor")
         @normalsDepthProgram.disableAttribute("textureCoord")
 
         @albedoProgram.enableProgram()
         @albedoProgram.enableAttribute("vertexPosition")
         @albedoProgram.enableAttribute("vertexNormal")
-        @albedoProgram.enableAttribute("vertexColor")
         @albedoProgram.enableAttribute("textureCoord")
         @albedoTexture.drawTo(
             ()=>
@@ -43,5 +40,4 @@ class GBuffer
         )
         @albedoProgram.disableAttribute("vertexPosition")
         @albedoProgram.disableAttribute("vertexNormal")
-        @albedoProgram.disableAttribute("vertexColor")
         @albedoProgram.disableAttribute("textureCoord")

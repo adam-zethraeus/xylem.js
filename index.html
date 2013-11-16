@@ -101,7 +101,6 @@
     precision mediump float;
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
-    varying vec3 vColor;
     varying vec4 vPosition;
     varying float vDepth;
     uniform float textureOpacity;
@@ -113,7 +112,6 @@
 <script id="generateNormalsAndDepth_v" type="x-shader/x-vertex">
     attribute vec3 vertexPosition;
     attribute vec3 vertexNormal;
-    attribute vec3 vertexColor;
     attribute vec2 textureCoord;
     uniform mat4 mvMatrix;
     uniform mat4 pMatrix;
@@ -121,14 +119,12 @@
     uniform float farClip;
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
-    varying vec3 vColor;
     varying vec4 vPosition;
     varying float vDepth;
     void main(void) {
         vPosition = mvMatrix * vec4(vertexPosition, 1.0);
         gl_Position = pMatrix * vPosition;
         vTextureCoord = textureCoord;
-        vColor = vertexColor;
         vTransformedNormal = nMatrix * vertexNormal;
         vDepth = -vPosition.z / farClip;
     } 
@@ -137,31 +133,28 @@
     precision mediump float;
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
-    varying vec3 vColor;
     varying vec4 vPosition;
+    uniform vec3 baseColor;
     uniform float textureOpacity;
     uniform sampler2D sampler;
     void main(void) {
-        gl_FragColor =  vec4(vColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
+        gl_FragColor =  vec4(baseColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
     }
 </script>
 <script id="generateAlbedo_v" type="x-shader/x-vertex">
     attribute vec3 vertexPosition;
     attribute vec3 vertexNormal;
-    attribute vec3 vertexColor;
     attribute vec2 textureCoord;
     uniform mat4 mvMatrix;
     uniform mat4 pMatrix;
     uniform mat3 nMatrix;
     varying vec2 vTextureCoord;
     varying vec3 vTransformedNormal;
-    varying vec3 vColor;
     varying vec4 vPosition;
     void main(void) {
         vPosition = mvMatrix * vec4(vertexPosition, 1.0);
         gl_Position = pMatrix * vPosition;
         vTextureCoord = textureCoord;
-        vColor = vertexColor;
         vTransformedNormal = nMatrix * vertexNormal;
     }
 </script>
@@ -261,10 +254,7 @@ window.onload = function(){
     setInterval( function () {
 
             stats.begin();
-
-                // your code goes here
-
-                    stats.end();
+            stats.end();
 
     }, 1000 / 60 );
     var x = new Xylem(document.getElementById("render_canvas")),
