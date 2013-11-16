@@ -265,7 +265,7 @@ window.onload = function(){
     document.getElementById("aa_toggle").onclick = function(){
         x.toggleAntiAliase();
     }
-    document.getElementById("inject_stats").onclick = function(){
+    document.getElementById("inject_stats").onclick = function(x){
         var stats = new Stats();
         stats.setMode(0);
         stats.domElement.style.position = 'absolute';
@@ -275,11 +275,10 @@ window.onload = function(){
         document.body.appendChild( stats.domElement );
 
         setInterval( function () {
-
-                stats.begin();
-                stats.end();
-
+            stats.begin();
+            stats.end();
         }, 1000 / 60 );
+        x.toElement.parentElement.removeChild(x.toElement);
     }
 }
 </script>
