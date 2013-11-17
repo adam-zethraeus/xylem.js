@@ -44,6 +44,10 @@ class Model
         return @buffers
 
     draw: (shaderProgram, texture)->
+        shaderProgram.enableAttribute("vertexPosition")
+        shaderProgram.enableAttribute("vertexNormal")
+        if @hasTexture
+            shaderProgram.enableAttribute("textureCoord")
         shaderProgram.setUniform1f("textureOpacity", @textureOpacity)
         shaderProgram.setUniform3f("baseColor", [@baseColor.r, @baseColor.g, @baseColor.b])
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
@@ -61,10 +65,15 @@ class Model
         @gl.drawElements(@gl.TRIANGLES, @buffers.indexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
         if @hasTexture
             texture.unbind(bindLocation)
+            shaderProgram.disableAttribute("textureCoord")
+        shaderProgram.disableAttribute("vertexPosition")
+        shaderProgram.disableAttribute("vertexNormal")
 
     drawLines: (shaderProgram)->
+        shaderProgram.enableAttribute("vertexPosition")
         @gl.bindBuffer(@gl.ARRAY_BUFFER, @buffers.vertexPositionBuffer)
         @gl.vertexAttribPointer(shaderProgram.getAttribute("vertexPosition"), @buffers.vertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
         @gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @buffers.indexBuffer)
         for i in [0 .. @buffers.indexBuffer.numItems - 3] by 3
             @gl.drawElements(@gl.LINE_LOOP, 3, @gl.UNSIGNED_SHORT, i * 2)
+        shaderProgram.disableAttribute("vertexPosition")

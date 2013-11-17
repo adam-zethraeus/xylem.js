@@ -194,14 +194,12 @@ class Xylem
     drawWireframe: ()->
         camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         @wireframeProgram.enableProgram()
-        @wireframeProgram.enableAttribute("vertexPosition")
         @buffers[@currBuffer].drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
                 @sceneGraph.drawWireframe(@wireframeProgram, camera)
             true
         )
-        @wireframeProgram.disableAttribute("vertexPosition")
 
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
