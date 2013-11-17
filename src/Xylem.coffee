@@ -7,6 +7,17 @@ class Xylem
         @screenQuad = new FullscreenQuad(@gl)
         @drawFunction = @draw
         @antiAliase = false
+        @activeKeys = []
+        @camera = null
+
+    activateKey: (code)->
+        @activeKeys[code] = true
+
+    clearKey: (code)->
+        @activeKeys[code] = false
+
+    getKeyState: (code)->
+        return not not @activeKeys[code]
 
     toggleDrawType: ()->
         if @drawFunction is @draw
@@ -94,6 +105,7 @@ class Xylem
         objs = getOrThrow(scene, "tree")
         for obj in objs
             objTraverse(@sceneGraph.getRoot(), obj)
+        @camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
 
         callback()
     
@@ -126,11 +138,10 @@ class Xylem
         @currBuffer = @currBuffer ^ 1
 
     draw: ()->
-        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         lights = @sceneGraph.getNodesOfType(SceneLight)
         origin = vec4.fromValues(0, 0, 0, 1)
         @gl.enable(@gl.DEPTH_TEST)
-        @gBuffer.populate((shader)=>@sceneGraph.draw(shader, camera))
+        @gBuffer.populate((shader)=>@sceneGraph.draw(shader, @camera))
         @gl.disable(@gl.DEPTH_TEST)
         @gBuffer.albedoTexture.bind(0)
         @ambientProgram.enableProgram()
@@ -150,8 +161,8 @@ class Xylem
         @gBuffer.normalsDepthTexture.bind(0)
         @gBuffer.albedoTexture.bind(1)
         @pointLightingProgram.enableProgram()
-        @pointLightingProgram.setUniform1f("farClip", camera.farClip);
-        @pointLightingProgram.setUniformMatrix4fv("pMatrix", camera.getInverseProjectionMatrix())
+        @pointLightingProgram.setUniform1f("farClip", @camera.farClip);
+        @pointLightingProgram.setUniformMatrix4fv("pMatrix", @camera.getInverseProjectionMatrix())
         @pointLightingProgram.enableAttribute("vertexPosition")
         @pointLightingProgram.enableAttribute("textureCoord")
         @pointLightingProgram.setUniform1i("normals", 0)
@@ -161,7 +172,7 @@ class Xylem
         for light in lights
             pos = vec4.create()
             lightMVMatrix = mat4.create()
-            mat4.multiply(lightMVMatrix, camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
+            mat4.multiply(lightMVMatrix, @camera.getCumulativeViewMatrix(), light.getCumulativeModelMatrix())
             vec4.transformMat4(pos, origin, lightMVMatrix)
             light.setUniforms(@pointLightingProgram, [pos[0], pos[1], pos[2]])
             @buffers[@currBuffer].drawTo(
@@ -192,12 +203,11 @@ class Xylem
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
     drawWireframe: ()->
-        camera = @sceneGraph.getNodesOfType(SceneCamera)[0]
         @wireframeProgram.enableProgram()
         @buffers[@currBuffer].drawTo(
             ()=>
                 @gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
-                @sceneGraph.drawWireframe(@wireframeProgram, camera)
+                @sceneGraph.drawWireframe(@wireframeProgram, @camera)
             true
         )
 

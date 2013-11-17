@@ -1,5 +1,5 @@
 {
-    "baseColor" : {"r":1.0,"g":1.0,"b":1.0},
+    "baseColor" : {"r":1.0,"g":1.0,"b":0.8},
     "textureOpacity" : 0.5,
     "vertexPositions" : [
                 -1.0, -1.0,  1.0,

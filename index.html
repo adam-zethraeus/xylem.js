@@ -244,7 +244,12 @@ window.onload = function(){
     var x = new Xylem(document.getElementById("render_canvas")),
         sceneUrl = "scenes/cornell.scene.json",
         scene = null;
-
+    window.onkeydown = function(key) {
+        x.activateKey(key.keyCode);
+    }
+    window.onkeyup = function(key) {
+        x.clearKey(key.keyCode);
+    }
     httpRequest = new XMLHttpRequest();
         httpRequest.addEventListener("readystatechange",function(){
             if (httpRequest.readyState !== 4) {
