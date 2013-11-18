@@ -2,6 +2,8 @@
 
 A browser based deferred renderer.
 
+You can play with [xylem.js at github pages](http://zethraeus.github.io/xylem.js/index.html).
+
 ![cornell box with teapot](notes/ss_2013-11-16_2.png)
 
 Status: Functional deferred rendering supporting multiple point lights.
