@@ -1,0 +1,124 @@
+{
+    "resources" : [
+        {
+            "name" : "metal_texture",
+            "url" : "textures/metal.jpg",
+            "type" : "image"
+        },
+        {
+            "name" : "cornell_colors",
+            "url" : "textures/cornell_colors.png",
+            "type" : "image"
+        }, {
+            "name" : "teapot_model",
+            "url" : "models/teapot.model.json",
+            "type" : "json"
+        }, {
+            "name" : "bunny_model",
+            "url" : "models/bunny.model.json",
+            "type" : "json"
+        }, {
+            "name" : "cornell_box_model",
+            "url" : "models/cornell.model.json",
+            "type" : "json"
+        }, {
+            "name" : "cube_model",
+            "url" : "models/cube.model.json",
+            "type" : "json"
+        }
+    ],
+    "tree" : [
+        {
+            "name" : "camera_1",
+            "type" : "camera",
+            "fieldOfViewAngle": 60,
+            "nearPlaneDistance": 0.1,
+            "farPlaneDistance": 100,
+            "translate" : [0,0,10],
+            "look": [0,0,-1]
+        },
+        {
+            "name" : "cornell_box",
+            "type" : "object",
+            "translate" : [0, 0, 0],
+            "scale" : [6, 6, 6],
+            "model" : "cornell_box_model",
+            "texture" : "cornell_colors",
+            "children" : [
+                {
+                    "name" : "light_1",
+                    "type" : "light",
+                    "lightType" : "point",
+                    "translate" : [-0.4, 0.2, 0.4],
+                    "diffuseColor" : [0.8, 0.8, 0.8],
+                    "specularColor" : [0.8, 0.8, 0.8],
+                    "specularHardness" : 16,
+                    "constantAttenuation" : 0.1,
+                    "linearAttenuation" : 0.0,
+                    "quadraticAttenuation" : 0.005 
+                },
+                {
+                    "name" : "light_2",
+                    "type" : "light",
+                    "lightType" : "point",
+                    "translate" : [0.4, -0.2, 0.4],
+                    "diffuseColor" : [0.3, 0.8, 0.8],
+                    "specularColor" : [0.3, 0.8, 0.8],
+                    "specularHardness" : 16,
+                    "constantAttenuation" : 0.1,
+                    "linearAttenuation" : 0.0,
+                    "quadraticAttenuation" : 0.01
+                },
+                {
+                    "name" : "cuboid_1",
+                    "type" : "object",
+                    "translate" : [2, -1.2, -1.5],
+                    "scale" : [0.3, 0.5, 0.3],
+                    "model" : "cube_model",
+                    "rotation" : {
+                        "degrees" : 20,
+                        "axis" : [0, 1, 0]
+                    },
+                    "children" : [
+                        {
+                            "name" : "bunny",
+                            "type" : "object",
+                            "translate" : [0, 0.09, 0],
+                            "scale" : [8.0, 8.0, 8.0],
+                            "model" : "bunny_model",
+                            "rotation" : {
+                                "degrees" : 100,
+                                "axis" : [1, 0, 0]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name" : "cuboid_2",
+                    "type" : "object",
+                    "translate" : [-2, -2.5, -0.4],
+                    "scale" : [0.2, 0.3, 0.2],
+                    "model" : "cube_model",
+                    "rotation" : {
+                        "degrees" : -30,
+                        "axis" : [0, 1, 0]
+                    },
+                    "children" : [
+                        {
+                            "name" : "teapot",
+                            "type" : "object",
+                            "translate" : [0, 20, 0],
+                            "scale" : [0.1, 0.07, 0.1],
+                            "texture" : "metal_texture",
+                            "model" : "teapot_model",
+                            "rotation" : {
+                                "degrees" : 200,
+                                "axis" : [0, 1, 0]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

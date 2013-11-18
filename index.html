@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>xylem.js</title>
+<style>
+    #render_canvas {
+        background: #000;
+        display: block;
+        margin: 5px auto;
+    }
+</style>
+<script src="libraries/gl-matrix.js"></script>
+<script src="libraries/CallbackBarrier.js"></script>
+<script src="libraries/browserVersionOf.js"></script>
+<script src="libraries/degreesToRadians.js"></script>
+<script src="libraries/powerOfTwo.js"></script>
+<script src="libraries/stats/build/stats.min.js"></script>
+<script src="xylem.js"></script>
+<script id="ambientPass_f" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D albedos;
+    uniform vec3 ambientColor;
+    void main(void) {
+        vec4 albedo = texture2D(albedos, vTextureCoord);
+        gl_FragColor = vec4(albedo.rgb * ambientColor, albedo.a);
+    }
+</script>
+<script id="ambientPass_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec2 textureCoord;
+    varying vec2 vTextureCoord;
+    void main(void) {
+        gl_Position = vec4(vertexPosition, 1.0);
+        vTextureCoord = textureCoord;
+    }
+</script>
+<script id="pointLightPass_f" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoord;
+    varying vec4 vPosition;
+    uniform sampler2D normals;
+    uniform sampler2D albedos;
+    uniform vec3 ambientColor;
+    uniform vec3 pointLightLocation;
+    uniform vec3 pointLightSpecularColor;
+    uniform vec3 pointLightDiffuseColor;
+    uniform float constantAttenuation;
+    uniform float linearAttenuation;
+    uniform float quadraticAttenuation;
+    uniform float specularHardness;
+    uniform float farClip;
+    void main(void) {
+        vec4 normal = texture2D(normals, vTextureCoord);
+        vec4 albedo = texture2D(albedos, vTextureCoord);
+        float depth = texture2D(normals, vTextureCoord).a;
+        vec3 viewRay = vec3(vPosition.xy * (-farClip/vPosition.z), -farClip);
+        vec3 position = viewRay * depth;
+        vec3 lightDirection = normalize(pointLightLocation - position);
+        float distance = length(position - pointLightLocation);
+        vec3 eyeDirection = normalize(-position);
+        vec3 reflectionDirection = reflect(-lightDirection, normal.xyz);
+        float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), specularHardness);
+        float diffuseLightWeighting = max(dot(normal.xyz, lightDirection), 0.0);
+        float brightness = max(1.0 - (constantAttenuation + distance * (linearAttenuation + distance * quadraticAttenuation)), 0.0);
+        vec3 lightWeighting = pointLightSpecularColor * specularLightWeighting + pointLightDiffuseColor * diffuseLightWeighting;
+        lightWeighting = vec3(min(lightWeighting.x, 1.0), min(lightWeighting.y, 1.0), min(lightWeighting.z, 1.0));
+        gl_FragColor = vec4(albedo.rgb * lightWeighting * brightness, albedo.a);
+    }
+</script>
+<script id="pointLightPass_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec2 textureCoord;
+    varying vec2 vTextureCoord;
+    varying vec4 vPosition;
+    uniform mat4 pMatrix;
+    void main(void) {
+        gl_Position = vec4(vertexPosition, 1.0);
+        vPosition =  pMatrix * gl_Position;
+        vTextureCoord = textureCoord;
+    }
+</script>
+<script id="wireframe_f" type="x-shader/x-fragment">
+    precision mediump float;
+    void main(void) {
+        gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+    }
+</script>
+<script id="wireframe_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    uniform mat4 mvMatrix;
+    uniform mat4 pMatrix;
+    varying vec4 vPosition;
+    void main(void) {
+        vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+        gl_Position = pMatrix * vPosition;
+    }
+</script>
+<script id="generateNormalsAndDepth_f" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoord;
+    varying vec3 vTransformedNormal;
+    varying vec4 vPosition;
+    varying float vDepth;
+    uniform float textureOpacity;
+    uniform sampler2D sampler;
+    void main(void) {
+        gl_FragColor = vec4(normalize(vTransformedNormal), vDepth);
+    }
+</script>
+<script id="generateNormalsAndDepth_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec3 vertexNormal;
+    attribute vec2 textureCoord;
+    uniform mat4 mvMatrix;
+    uniform mat4 pMatrix;
+    uniform mat3 nMatrix;
+    uniform float farClip;
+    varying vec2 vTextureCoord;
+    varying vec3 vTransformedNormal;
+    varying vec4 vPosition;
+    varying float vDepth;
+    void main(void) {
+        vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+        gl_Position = pMatrix * vPosition;
+        vTextureCoord = textureCoord;
+        vTransformedNormal = nMatrix * vertexNormal;
+        vDepth = -vPosition.z / farClip;
+    } 
+</script>
+<script id="generateAlbedo_f" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoord;
+    varying vec3 vTransformedNormal;
+    varying vec4 vPosition;
+    uniform vec3 baseColor;
+    uniform float textureOpacity;
+    uniform sampler2D sampler;
+    void main(void) {
+        gl_FragColor =  vec4(baseColor, 1.0) * (1.0 - textureOpacity) + texture2D(sampler, vec2(vTextureCoord.s, vTextureCoord.t)) * textureOpacity;
+    }
+</script>
+<script id="generateAlbedo_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec3 vertexNormal;
+    attribute vec2 textureCoord;
+    uniform mat4 mvMatrix;
+    uniform mat4 pMatrix;
+    uniform mat3 nMatrix;
+    varying vec2 vTextureCoord;
+    varying vec3 vTransformedNormal;
+    varying vec4 vPosition;
+    void main(void) {
+        vPosition = mvMatrix * vec4(vertexPosition, 1.0);
+        gl_Position = pMatrix * vPosition;
+        vTextureCoord = textureCoord;
+        vTransformedNormal = nMatrix * vertexNormal;
+    }
+</script>
+<script id="blitShader_f" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoord;
+    uniform sampler2D sampler;
+    void main(void) {
+        gl_FragColor = texture2D(sampler, vTextureCoord);
+    }
+</script>
+<script id="blitShader_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec2 textureCoord;
+    varying vec2 vTextureCoord;
+    void main(void) {
+        gl_Position = vec4(vertexPosition, 1.0);
+        vTextureCoord = textureCoord;
+    }
+</script>
+<script id="fxaaShader_f" type="x-shader/x-fragment">
+
+precision mediump float;
+
+uniform sampler2D tex;
+uniform vec2 viewportDimensions; 
+varying vec2 vTextureCoord;
+
+#define FXAA_REDUCE_MIN (1.0/ 128.0)
+#define FXAA_REDUCE_MUL (1.0 / 8.0)
+#define FXAA_SPAN_MAX 8.0
+
+void main(){
+    vec2 inverseVP = vec2(1.0 / viewportDimensions.x, 1.0 / viewportDimensions.y);
+    vec3 rgbNW = texture2D(tex, (gl_FragCoord.xy + vec2(-1.0, -1.0)) * inverseVP).xyz;
+    vec3 rgbNE = texture2D(tex, (gl_FragCoord.xy + vec2(1.0, -1.0)) * inverseVP).xyz;
+    vec3 rgbSW = texture2D(tex, (gl_FragCoord.xy + vec2(-1.0, 1.0)) * inverseVP).xyz;
+    vec3 rgbSE = texture2D(tex, (gl_FragCoord.xy + vec2(1.0, 1.0)) * inverseVP).xyz;
+    vec3 rgbM  = texture2D(tex, gl_FragCoord.xy  * inverseVP).xyz;
+    vec3 luma = vec3(0.299, 0.587, 0.114);
+    float lumaNW = dot(rgbNW, luma);
+    float lumaNE = dot(rgbNE, luma);
+    float lumaSW = dot(rgbSW, luma);
+    float lumaSE = dot(rgbSE, luma);
+    float lumaM  = dot(rgbM,  luma);
+    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+    
+    vec2 dir;
+    dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));
+    dir.y =  ((lumaNW + lumaSW) - (lumaNE + lumaSE));
+    
+    float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) *
+                          (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);
+    
+    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+    dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX),
+              max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
+              dir * rcpDirMin)) * inverseVP;
+      
+    vec3 rgbA = 0.5 * (
+        texture2D(tex, gl_FragCoord.xy * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz +
+        texture2D(tex, gl_FragCoord.xy * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);
+    vec3 rgbB = rgbA * 0.5 + 0.25 * (
+        texture2D(tex, gl_FragCoord.xy * inverseVP + dir * -0.5).xyz +
+        texture2D(tex, gl_FragCoord.xy * inverseVP + dir * 0.5).xyz);
+
+    float lumaB = dot(rgbB, luma);
+    if ((lumaB < lumaMin) || (lumaB > lumaMax)) {
+        gl_FragColor = vec4(rgbA, 1.0);
+    } else {
+        gl_FragColor = vec4(rgbB, 1.0);
+    }
+}
+</script>
+<script id="fxaaShader_v" type="x-shader/x-vertex">
+    attribute vec3 vertexPosition;
+    attribute vec2 textureCoord;
+    varying vec2 vTextureCoord;
+    void main(void) {
+        gl_Position = vec4(vertexPosition, 1.0);
+        vTextureCoord = textureCoord;
+    }
+</script>
+<script>
+window.onload = function(){
+    var x = new Xylem(document.getElementById("render_canvas")),
+        sceneUrl = "scenes/cornell.scene.json",
+        scene = null;
+    window.onkeydown = function(e) {
+        x.activateKey(e.keyCode);
+    }
+    window.onkeyup = function(key) {
+        x.clearKey(key.keyCode);
+    }
+    httpRequest = new XMLHttpRequest();
+        httpRequest.addEventListener("readystatechange",function(){
+            if (httpRequest.readyState !== 4) {
+                return null;
+            }
+            if (httpRequest.status === 200) {
+                scene = JSON.parse(httpRequest.responseText);
+            } else {
+                throw "Failure loading scene file.";
+            }
+        });
+        httpRequest.open("GET", sceneUrl, false); // sync
+        httpRequest.send();
+    x.loadScene(scene, function(){x.mainLoop();});
+    document.getElementById("wireframe_toggle").onclick = function(){
+        x.toggleDrawType();
+    }
+    document.getElementById("aa_toggle").onclick = function(){
+        x.toggleAntiAliase();
+    }
+    document.getElementById("inject_stats").onclick = function(x){
+        var stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+
+        document.body.appendChild( stats.domElement );
+
+        setInterval( function () {
+            stats.begin();
+            stats.end();
+        }, 1000 / 60 );
+        x.toElement.parentElement.removeChild(x.toElement);
+    }
+}
+</script>
+</head>
+<body>
+    <canvas id="render_canvas" width="1024" height="512"></canvas>
+    <button id="wireframe_toggle">Toggle Wireframe</button>
+    <button id="aa_toggle">Toggle AntiAliasing</button>
+    <button id="inject_stats">Inject Stats</button>
+</body>
+</html>
