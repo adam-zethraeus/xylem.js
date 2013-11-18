@@ -10,8 +10,8 @@ class SceneNode
     translate: (vector)->
         mat4.translate(@modelMatrix, @modelMatrix, vector)
     
-    rotate: (degrees, axis)->
-        mat4.rotate(@modelMatrix, @modelMatrix, degrees, axis)
+    rotate: (radians, axis)->
+        mat4.rotate(@modelMatrix, @modelMatrix, radians, axis)
 
     resetModelMatrix: ()->
         mat4.identity(@modelMatrix)

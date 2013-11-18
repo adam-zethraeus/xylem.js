@@ -16,9 +16,6 @@ class Xylem
     clearKey: (code)->
         @activeKeys[code] = false
 
-    getKeyState: (code)->
-        return not not @activeKeys[code]
-
     toggleDrawType: ()->
         if @drawFunction is @draw
             @drawFunction = @drawWireframe
@@ -214,6 +211,7 @@ class Xylem
         @screenQuad.drawWithTexture(@buffers[@currBuffer])
 
     mainLoop: ()->
+        @camera.updateStateFromActiveKeys(@activeKeys)
         @drawFunction()
         browserVersionOf("requestAnimationFrame")(()=>@mainLoop())
 

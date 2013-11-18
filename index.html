@@ -244,8 +244,8 @@ window.onload = function(){
     var x = new Xylem(document.getElementById("render_canvas")),
         sceneUrl = "scenes/cornell.scene.json",
         scene = null;
-    window.onkeydown = function(key) {
-        x.activateKey(key.keyCode);
+    window.onkeydown = function(e) {
+        x.activateKey(e.keyCode);
     }
     window.onkeyup = function(key) {
         x.clearKey(key.keyCode);
