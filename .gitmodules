@@ -1,0 +1,3 @@
+[submodule "libraries/stats"]
+	path = libraries/stats
+	url = https://github.com/mrdoob/stats.js.git
